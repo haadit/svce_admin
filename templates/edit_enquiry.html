@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit Enquiry</title>
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 900px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 38px 38px 30px 38px;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+        color: #2d3a4a;
+        margin-bottom: 32px;
+        font-size: 2.1rem;
+        letter-spacing: 1px;
+      }
+      .form-group {
+        margin-bottom: 22px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #3b4a5a;
+        font-size: 1.08em;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="number"],
+      input[type="date"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1.5px solid #c7d2fe;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 1.05em;
+        background: #f8fafc;
+        transition: border 0.2s;
+      }
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="number"]:focus,
+      input[type="date"]:focus,
+      textarea:focus {
+        border: 1.5px solid #007bff;
+        outline: none;
+        background: #fff;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      .row > .form-group {
+        flex: 1 1 calc(50% - 10px);
+      }
+      .row.three-cols > .form-group {
+        flex: 1 1 calc(33.333% - 13.333px);
+      }
+      .row.four-cols > .form-group {
+        flex: 1 1 calc(25% - 15px);
+      }
+      .full-width {
+        flex: 1 1 100%;
+      }
+      .section-title {
+        margin-top: 36px;
+        margin-bottom: 18px;
+        font-size: 1.25rem;
+        color: #007bff;
+        border-bottom: 2px solid #e0e7ff;
+        padding-bottom: 6px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .checkbox-group label {
+        font-weight: normal;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      .checkbox-group input[type="checkbox"] {
+        margin-right: 10px;
+        width: auto;
+      }
+      .button-group {
+        margin-top: 36px;
+        text-align: right;
+      }
+      button,
+      .print-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 13px 26px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1.08em;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        transition: background 0.2s;
+      }
+      button:hover,
+      .print-btn:hover {
+        background-color: #0056b3;
+      }
+      .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #555;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .back-link:hover {
+        text-decoration: underline;
+      }
+      .error-message {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+      .preference-list {
+        margin-top: 15px;
+        border: 1px solid #c7d2fe;
+        padding: 10px;
+        border-radius: 6px;
+        background-color: #f8fafc;
+      }
+      .preference-list p {
+        margin: 5px 0;
+        padding-left: 10px;
+        border-left: 3px solid #007bff;
+      }
+      .info-box {
+        background-color: #e9f5ff;
+        border: 1px solid #b3e0ff;
+        color: #004085;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .info-box i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+      }
+      .selected-course-row {
+        background: #e6f2ff !important;
+      }
+      @media print {
+        .print-btn,
+        .back-link {
+          display: none !important;
+        }
+        body {
+          background: #fff !important;
+        }
+        .container {
+          box-shadow: none !important;
+          border: none !important;
+        }
+      }
+      @media (max-width: 900px) {
+        .container {
+          margin: 10px;
+          padding: 12px;
+          width: calc(100% - 10px);
+        }
+        h2 {
+          font-size: 1.4rem;
+        }
+        .section-title {
+          font-size: 1.05rem;
+        }
+        input,
+        textarea {
+          font-size: 0.98em;
+        }
+      }
+      .styled-select {
+        width: 100%;
+        padding: 12px;
+        border: 1.5px solid #c7d2fe;
+        border-radius: 6px;
+        background: #f8fafc;
+        font-size: 1.05em;
+        color: #2d3a4a;
+        transition: border 0.2s;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 22px 22px;
+      }
+      .styled-select:focus {
+        border: 1.5px solid #007bff;
+        outline: none;
+        background: #fff;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <a href="{{ url_for('dashboard') }}" class="back-link"
+          >&larr; Back to Dashboard</a
+        >
+        <button type="button" onclick="window.print()" class="print-btn">
+          Print
+        </button>
+      </div>
+      <h2>Edit Admission Enquiry</h2>
+
+      {% if not connected %}
+      <p class="error-message">Failed to load enquiry details.</p>
+      {% if error %}
+      <p class="error-message">Error: {{ error }}</p>
+      {% endif %} {% elif enquiry is none %}
+      <p class="error-message">Enquiry not found.</p>
+      {% else %} {% if error %}
+      <p class="error-message">Error: {{ error }}</p>
+      {% endif %}
+
+      <form method="POST">
+        <div class="row">
+          <div class="form-group">
+            <label for="token_number">Token Number:</label>
+            {# Display token number but make it non-editable #}
+            <input
+              type="text"
+              id="token_number"
+              value="{{ enquiry.token_number | default('', true) }}"
+              disabled
+            />
+          </div>
+          <div class="form-group">
+            <label for="enquiry_date">Enquiry Date:</label>
+            <input
+              type="date"
+              id="enquiry_date"
+              name="enquiry_date"
+              value="{{ enquiry.enquiry_date | default('', true) }}"
+            />
+          </div>
+        </div>
+
+        <div class="section-title">Personal Details</div>
+        <div class="row">
+          <div class="form-group">
+            <label for="student_name">Student Name:</label>
+            <input
+              type="text"
+              id="student_name"
+              name="student_name"
+              value="{{ enquiry.student_name | default('', true) }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="father_name">Father's Name:</label>
+            <input
+              type="text"
+              id="father_name"
+              name="father_name"
+              value="{{ enquiry.father_name | default('', true) }}"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group">
+            <label for="mother_name">Mother's Name:</label>
+            <input
+              type="text"
+              id="mother_name"
+              name="mother_name"
+              value="{{ enquiry.mother_name | default('', true) }}"
+            />
+          </div>
+          <div class="form-group full-width">
+            <label for="address">Address:</label>
+            <textarea id="address" name="address">
+{{ enquiry.address | default('', true) }}</textarea
+            >
+          </div>
+        </div>
+
+        <div class="section-title">Contact Details</div>
+        <div class="row">
+          <div class="form-group">
+            <label for="student_email">Student Email:</label>
+            <input
+              type="email"
+              id="student_email"
+              name="student_email"
+              value="{{ enquiry.student_email | default('', true) }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="student_mobile">Student Mobile Number:</label>
+            <input
+              type="text"
+              id="student_mobile"
+              name="student_mobile"
+              value="{{ enquiry.student_mobile | default('', true) }}"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group">
+            <label for="father_mobile">Father's Mobile Number:</label>
+            <input
+              type="text"
+              id="father_mobile"
+              name="father_mobile"
+              value="{{ enquiry.father_mobile | default('', true) }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="mother_mobile">Mother's Mobile Number:</label>
+            <input
+              type="text"
+              id="mother_mobile"
+              name="mother_mobile"
+              value="{{ enquiry.mother_mobile | default('', true) }}"
+            />
+          </div>
+        </div>
+        <div class="row full-width">
+          <div class="form-group">
+            <label for="reference">Reference:</label>
+            <input
+              type="text"
+              id="reference"
+              name="reference"
+              value="{{ enquiry.reference | default('', true) }}"
+            />
+          </div>
+        </div>
+
+        <div class="section-title">12th Standard Marks</div>
+        <p style="color: red; font-size: 0.9em;">(Physics, Chemistry, and Mathematics are mandatory)</p>
+        <div class="row three-cols">
+          <div class="form-group">
+            <label for="physics_marks">Physics:</label>
+            <input type="number" id="physics_marks" name="physics_marks" value="{{ enquiry.physics_marks | default('', true) }}" step="any">
+          </div>
+          <div class="form-group">
+            <label for="chemistry_marks">Chemistry:</label>
+            <input type="number" id="chemistry_marks" name="chemistry_marks" value="{{ enquiry.chemistry_marks | default('', true) }}" step="any">
+          </div>
+          <div class="form-group">
+            <label for="mathematics_marks">Mathematics:</label>
+            <input type="number" id="mathematics_marks" name="mathematics_marks" value="{{ enquiry.mathematics_marks | default('', true) }}" step="any">
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group">
+            <label for="education_board">Education Board (11th):</label>
+            <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
+              <option value="">Select Board</option>
+              {% set current_board = enquiry.education_board|default('', true) %}
+              {% if current_board and current_board not in education_board_options %}
+                <option value="{{ current_board }}" selected>{{ current_board }}</option>
+              {% endif %}
+              {% for board in education_board_options %}
+                <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div id="section11th" style="display: none;">
+          <div class="section-title">11th Standard Details</div>
+          <div class="row three-cols" id="marks11Fields">
+            <div class="form-group">
+              <label for="physics_marks_11">Physics (11th):</label>
+              <input type="number" id="physics_marks_11" name="physics_marks_11" value="{{ enquiry.physics_marks_11 | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="chemistry_marks_11">Chemistry (11th):</label>
+              <input type="number" id="chemistry_marks_11" name="chemistry_marks_11" value="{{ enquiry.chemistry_marks_11 | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="mathematics_marks_11">Mathematics (11th):</label>
+              <input type="number" id="mathematics_marks_11" name="mathematics_marks_11" value="{{ enquiry.mathematics_marks_11 | default('', true) }}" step="any">
+            </div>
+          </div>
+        </div>
+        <script>
+          function toggle11thFields() {
+            var board = document.getElementById('education_board').value;
+            var section11th = document.getElementById('section11th');
+            if (board === 'AP/Telangana') {
+              section11th.style.display = 'block';
+            } else {
+              section11th.style.display = 'none';
+            }
+          }
+          document.addEventListener('DOMContentLoaded', function() {
+            toggle11thFields();
+          });
+        </script>
+
+        <div class="section-title">CS: (Optional)</div>
+        <div class="row three-cols">
+          <div class="form-group">
+            <label for="cs_marks">CS: (Optional)</label>
+            <input
+              type="number"
+              id="cs_marks"
+              name="cs_marks"
+              value="{{ enquiry.cs_marks | default('', true) }}"
+              step="any"
+            />
+          </div>
+          <div class="form-group">
+            <label for="bio_marks">BIO: (Optional)</label>
+            <input
+              type="number"
+              id="bio_marks"
+              name="bio_marks"
+              value="{{ enquiry.bio_marks | default('', true) }}"
+              step="any"
+            />
+          </div>
+          <div class="form-group">
+            <label for="ece_marks">ECE: (Optional)</label>
+            <input
+              type="number"
+              id="ece_marks"
+              name="ece_marks"
+              value="{{ enquiry.ece_marks | default('', true) }}"
+              step="any"
+            />
+          </div>
+        </div>
+        <div class="row two-cols">
+          <div class="form-group">
+            <label for="total_percentage">Total Percentage:</label>
+            <input
+              type="number"
+              id="total_percentage"
+              name="total_percentage"
+              value="{{ enquiry.total_percentage | default('', true) }}"
+              step="any"
+            />
+          </div>
+          <div class="form-group">
+            <label for="pcm_percentage">PCM Percentage:</label>
+            <input
+              type="number"
+              id="pcm_percentage"
+              name="pcm_percentage"
+              value="{{ enquiry.pcm_percentage | default('', true) }}"
+              step="any"
+            />
+          </div>
+        </div>
+
+        <div class="section-title">Entrance Exam Detail</div>
+        <div class="row three-cols">
+          <div class="form-group">
+            <label for="jee_rank">JEE Rank:</label>
+            <input
+              type="number"
+              id="jee_rank"
+              name="jee_rank"
+              value="{{ enquiry.jee_rank | default('', true) }}"
+              step="1"
+            />
+          </div>
+          <div class="form-group">
+            <label for="comedk_rank">COMEDK Rank:</label>
+            <input
+              type="number"
+              id="comedk_rank"
+              name="comedk_rank"
+              value="{{ enquiry.comedk_rank | default('', true) }}"
+              step="1"
+            />
+          </div>
+          <div class="form-group">
+            <label for="cet_rank">CET Rank:</label>
+            <input
+              type="number"
+              id="cet_rank"
+              name="cet_rank"
+              value="{{ enquiry.cet_rank | default('', true) }}"
+              step="1"
+            />
+          </div>
+        </div>
+
+        <div class="section-title">Course Preference Order</div>
+        <div class="info-box">
+          <i class="fas fa-info-circle"></i> Click on courses in order of your
+          preference. The first course you select will be your first preference.
+        </div>
+
+        <div class="checkbox-group" style="margin-top: 20px">
+          {% for course in all_courses %}
+          <div
+            class="{% if course in current_preferences %}selected-course-row{% endif %}"
+            style="
+              display: grid;
+              grid-template-columns: 1fr 70px;
+              gap: 8px;
+              align-items: center;
+              margin-bottom: 6px;
+              border-radius: 6px;
+              border: 1px solid #dbeafe;
+              transition: background 0.2s;
+            "
+          >
+            <div style="display: flex; align-items: center">
+              {% if course in current_preferences %}
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 32px;
+                  height: 32px;
+                  background: #007bff;
+                  color: #fff;
+                  font-weight: bold;
+                  border-radius: 50%;
+                  font-size: 1.08em;
+                  margin-right: 14px;
+                "
+                >{{ current_preferences[course].preference_order }}</span
+              >
+              {% else %}
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 32px;
+                  height: 32px;
+                  background: #e0e7ff;
+                  color: #b0b7c3;
+                  font-weight: bold;
+                  border-radius: 50%;
+                  font-size: 1.08em;
+                  margin-right: 14px;
+                "
+                >&ndash;</span
+              >
+              {% endif %}
+              <input
+                type="checkbox"
+                name="course_preference"
+                value="{{ course }}"
+                id="course_{{ loop.index }}"
+                style="
+                  margin-right: 12px;
+                  transform: scale(1.2);
+                  accent-color: #007bff;
+                "
+                {%
+                if
+                course
+                in
+                current_preferences
+                %}
+                checked
+                {%
+                endif
+                %}
+              />
+              <label
+                for="course_{{ loop.index }}"
+                style="
+                  flex: 1;
+                  font-size: 1.08em;
+                  font-weight: 500;
+                  margin-bottom: 0;
+                  cursor: pointer;
+                  color: #222;
+                "
+              >
+                {{ course }}
+              </label>
+            </div>
+            {% if course in current_preferences %}
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <input
+                type="number"
+                name="preference_order_{{ course|replace(' ', '_')|replace('(', '')|replace(')', '')|replace('.', '') }}"
+                min="1"
+                style="
+                  width: 55px;
+                  height: 36px;
+                  font-size: 1.2em;
+                  border: 2px solid #007bff;
+                  border-radius: 7px;
+                  text-align: center;
+                  background: #f8fafc;
+                  color: #007bff;
+                  font-weight: bold;
+                "
+                value="{{ current_preferences[course].preference_order }}"
+                required
+              />
+            </div>
+            {% else %}
+            <div></div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if course_preferences %}
+        <div class="section-title">Current Preferences (in order)</div>
+        <div class="preference-list">
+          {% for pref in course_preferences %}
+          <p>{{ pref.preference_order }}. {{ pref.course_name }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="button-group">
+          <button type="submit">Save Changes</button>
+        </div>
+      </form>
+
+      {% endif %}
+    </div>
+  </body>
+</html>

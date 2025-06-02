@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard</title>
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+      .dashboard-container {
+        background: #fff;
+        padding: 36px 36px 30px 36px;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        max-width: 1200px;
+        margin: 40px auto;
+        flex-grow: 1;
+        width: calc(100% - 60px);
+        box-sizing: border-box;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #e0e7ff;
+        padding-bottom: 18px;
+        margin-bottom: 36px;
+      }
+      h2 {
+        color: #2d3a4a;
+        margin: 0;
+        font-size: 2.1rem;
+        letter-spacing: 1px;
+      }
+      .logout-link {
+        color: #fff;
+        background: #007bff;
+        padding: 10px 22px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        transition: background 0.2s, color 0.2s;
+      }
+      .logout-link:hover {
+        background: #0056b3;
+        color: #fff;
+      }
+      h3 {
+        color: #3b4a5a;
+        margin-top: 25px;
+        margin-bottom: 18px;
+        font-size: 1.35rem;
+        border-left: 4px solid #007bff;
+        padding-left: 12px;
+        letter-spacing: 0.5px;
+      }
+      .table-responsive {
+        overflow-x: auto;
+        margin-top: 18px;
+        padding-bottom: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 0;
+        min-width: 900px;
+        background: #f8fafc;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      }
+      th,
+      td {
+        padding: 16px 14px;
+        text-align: left;
+        word-break: normal;
+        white-space: nowrap;
+      }
+      th {
+        background: #e0e7ff;
+        font-weight: bold;
+        color: #2d3a4a;
+        font-size: 1.08em;
+        border-bottom: 2px solid #c7d2fe;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        vertical-align: top;
+      }
+      tr {
+        transition: background 0.18s;
+      }
+      tr:nth-child(even) td {
+        background: #f1f5f9;
+      }
+      tr:nth-child(odd) td {
+        background: #fff;
+      }
+      tr:hover td {
+        background: #dbeafe;
+      }
+      td {
+        color: #2d3a4a;
+        font-size: 1.04em;
+        vertical-align: top;
+        border-bottom: 1px solid #e0e7ff;
+      }
+      .error-message {
+        color: #dc3545;
+        margin-top: 20px;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 10px;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-weight: 500;
+      }
+      a:hover {
+        text-decoration: underline;
+        color: #0056b3;
+      }
+      @media (max-width: 900px) {
+        .dashboard-container {
+          margin: 10px;
+          padding: 12px;
+          width: calc(100% - 10px);
+        }
+        th,
+        td {
+          padding: 8px;
+          white-space: normal;
+        }
+        h2 {
+          font-size: 1.4rem;
+        }
+        h3 {
+          font-size: 1.1rem;
+        }
+        table {
+          min-width: 600px;
+        }
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="header">
+        <h2>Admin Dashboard</h2>
+        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+      </div>
+
+      {% if connected %}
+      <h3>Admission Enquiries:</h3>
+      {% if enquiries %}
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Token No</th>
+              <th>Student Name</th>
+              <th>Student Mobile</th>
+              <th>Student Email</th>
+              <th>Total Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enquiry in enquiries %}
+            <tr>
+              <td>
+                <a href="{{ url_for('edit_enquiry', enquiry_id=enquiry.id) }}"
+                  >{{ enquiry.token_number | default('', true) }}</a
+                >
+              </td>
+              <td>{{ enquiry.student_name | default('', true) }}</td>
+              <td>{{ enquiry.student_mobile | default('', true) }}</td>
+              <td>{{ enquiry.student_email | default('', true) }}</td>
+              <td>{{ enquiry.total_percentage | default('N/A', true) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p>No admission enquiries found.</p>
+      {% endif %} {% else %}
+      <p class="error-message">Failed to connect or fetch data:</p>
+      {% if error %}
+      <p class="error-message">{{ error }}</p>
+      {% endif %} {% endif %}
+    </div>
+  </body>
+</html>
