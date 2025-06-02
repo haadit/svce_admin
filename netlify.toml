@@ -4,4 +4,4 @@
   publish = "static"
 
 [dev]
-  command = "python supabase_admin_flask/app.py"
+  command = "python app.py"
