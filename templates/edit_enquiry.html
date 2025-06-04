@@ -18,6 +18,7 @@
         padding: 38px 38px 30px 38px;
         border-radius: 18px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #388bff;
       }
       h2 {
         text-align: center;
@@ -102,8 +103,8 @@
         width: auto;
       }
       .button-group {
-        margin-top: 36px;
-        text-align: right;
+        margin-top: 6px !important;
+        text-align: right !important;
       }
       button,
       .print-btn {
@@ -176,10 +177,132 @@
         }
         body {
           background: #fff !important;
+          font-size: 10.9px !important;
+          margin: 0 !important;
         }
         .container {
           box-shadow: none !important;
           border: none !important;
+          margin: 0 !important;
+          padding: 3px 6px 3px 6px !important;
+          max-width: 100vw !important;
+        }
+        .row, .row.three-cols, .row.four-cols, .row.two-cols {
+          gap: 2px !important;
+          margin-bottom: 2px !important;
+        }
+        .form-group {
+          margin-bottom: 2px !important;
+        }
+        .section-title {
+          font-size: 0.95em !important;
+          margin-top: 5px !important;
+          margin-bottom: 2px !important;
+          padding-bottom: 0 !important;
+        }
+        input, textarea, select {
+          font-size: 0.95em !important;
+          padding: 2px 4px !important;
+        }
+        label {
+          font-size: 0.95em !important;
+          margin-bottom: 1px !important;
+        }
+        h2, .header-title {
+          font-size: 1.05em !important;
+          margin: 0 !important;
+        }
+        img[alt="College Logo"] {
+          max-width: 37% !important;
+          width: 50% !important;
+          margin-bottom: 4px !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+          border-radius: 0 !important;
+          background: none !important;
+        }
+        .info-box, .preference-list, .checkbox-group {
+          padding: 2px !important;
+          margin-bottom: 2px !important;
+          min-height: 0 !important;
+          box-sizing: border-box !important;
+        }
+        textarea {
+          min-height: 30px !important;
+        }
+        .checkbox-group {
+          display: block !important;
+          border: 1px solid #c7d2fe !important;
+          background: #f8fafc !important;
+          border-radius: 6px !important;
+          padding: 2px 2px 2px 2px !important;
+          margin-top: 1px !important;
+        }
+        .checkbox-group > div {
+          margin-bottom: 1px !important;
+          padding: 0 !important;
+          border-radius: 4px !important;
+          border: none !important;
+          background: none !important;
+        }
+        .checkbox-group > div:last-child {
+          margin-bottom: 0 !important;
+        }
+        .button-group {
+          margin-top: 6px !important;
+        }
+        .error-message {
+          margin-bottom: 2px !important;
+          padding: 2px !important;
+        }
+        .print-hidden {
+          display: none !important;
+        }
+        .checkbox-group input[type="number"] { display: none !important; }
+        .checkbox-group input[type="checkbox"] { display: none !important; }
+        .checkbox-group span[style*="border-radius: 50%"] {
+          margin-right: 2px !important;
+          width: 18px !important;
+          height: 18px !important;
+          font-size: 0.7em !important;
+        }
+        .checkbox-group label {
+          font-size: 0.9em !important;
+          margin-bottom: 0 !important;
+        }
+        .checkbox-group > div {
+          grid-template-columns: auto 1fr !important;
+          gap: 4px !important;
+          align-items: center !important;
+          margin-bottom: 1px !important;
+        }
+        .checkbox-group {
+           border: none !important;
+           background: none !important;
+           padding: 0 !important;
+           margin-top: 1px !important;
+           margin-bottom: 2px !important;
+        }
+        .mandatory-note { display: none !important; }
+        .container > div:first-child span,
+        .container > div:nth-child(2) div:first-child,
+        .container > div:nth-child(2) div:nth-child(2),
+        .container > div:nth-child(2) div:last-child {
+          font-size: 0.95em !important;
+          letter-spacing: 0.5px !important;
+        }
+        .container > div:nth-child(2) div:first-child span,
+        .container > div:nth-child(2) div:last-child input {
+          font-size: 0.95em !important;
+          padding: 1px 4px !important;
+        }
+        label {
+          font-size: 0.95em !important;
+          margin-bottom: 1px !important;
+        }
+        input[type="text"], input[type="email"], input[type="number"], input[type="date"], textarea, select {
+          font-size: 0.85em !important;
+          padding: 2px 4px !important;
         }
       }
       @media (max-width: 900px) {
@@ -221,6 +344,9 @@
         outline: none;
         background: #fff;
       }
+      @media print {
+        .print-hidden { display: none !important; }
+      }
     </style>
     <link
       rel="stylesheet"
@@ -229,21 +355,27 @@
   </head>
   <body>
     <div class="container">
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <a href="{{ url_for('dashboard') }}" class="back-link"
-          >&larr; Back to Dashboard</a
-        >
-        <button type="button" onclick="window.print()" class="print-btn">
-          Print
-        </button>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 18px;">
+        <img src="{{ url_for('static', filename='college_logo.png') }}" alt="College Logo" style="max-width: 380px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 8px;" />
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="{{ url_for('dashboard') }}" class="back-link" style="margin-bottom: 0; background: #e3edff; color: #1a237e; padding: 10px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 1.08em; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: background 0.2s;">&larr; Back to Dashboard</a>
+          <button type="button" onclick="window.print()" class="print-btn" style="font-size: 1.1em; font-weight: 600; padding: 12px 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #388bff;"> <i class="fa fa-print"></i> Print</button>
+        </div>
       </div>
-      <h2>Edit Admission Enquiry</h2>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; margin-top: 8px;">
+        <div style="font-size: 1.1rem; font-weight: 500; color: #222;">Token No.: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.token_number | default('', true) }}</span></div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: #2d3a4a; letter-spacing: 1px; text-align: center;">ADMISSION ENQUIRY FORM</div>
+        <div style="font-size: 1.1rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
+          <label for="enquiry_date" style="margin: 0; font-weight: 500;">Date:</label>
+          <input
+            type="date"
+            id="enquiry_date"
+            name="enquiry_date"
+            value="{{ enquiry.enquiry_date | default('', true) }}"
+            style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600; border: 1px solid #c7d2fe; font-size: 1.08em; color: #222;"
+          />
+        </div>
+      </div>
 
       {% if not connected %}
       <p class="error-message">Failed to load enquiry details.</p>
@@ -256,29 +388,6 @@
       {% endif %}
 
       <form method="POST">
-        <div class="row">
-          <div class="form-group">
-            <label for="token_number">Token Number:</label>
-            {# Display token number but make it non-editable #}
-            <input
-              type="text"
-              id="token_number"
-              value="{{ enquiry.token_number | default('', true) }}"
-              disabled
-            />
-          </div>
-          <div class="form-group">
-            <label for="enquiry_date">Enquiry Date:</label>
-            <input
-              type="date"
-              id="enquiry_date"
-              name="enquiry_date"
-              value="{{ enquiry.enquiry_date | default('', true) }}"
-            />
-          </div>
-        </div>
-
-        <div class="section-title">Personal Details</div>
         <div class="row">
           <div class="form-group">
             <label for="student_name">Student Name:</label>
@@ -371,8 +480,8 @@
         </div>
 
         <div class="section-title">12th Standard Marks</div>
-        <p style="color: red; font-size: 0.9em;">(Physics, Chemistry, and Mathematics are mandatory)</p>
-        <div class="row three-cols">
+        <p class="mandatory-note" style="color: red; font-size: 0.9em;">(Physics, Chemistry, and Mathematics are mandatory)</p>
+        <div class="row three-cols" id="section12thStandard">
           <div class="form-group">
             <label for="physics_marks">Physics:</label>
             <input type="number" id="physics_marks" name="physics_marks" value="{{ enquiry.physics_marks | default('', true) }}" step="any">
@@ -401,20 +510,63 @@
             </select>
           </div>
         </div>
-        <div id="section11th" style="display: none;">
-          <div class="section-title">11th Standard Details</div>
-          <div class="row three-cols" id="marks11Fields">
+        <div id="section11th">
+          <div class="section-title">11th Standard Details <span style="color: red; font-size: 0.8em;">(For AP/Telangana students only)</span></div>
+          <div class="row three-cols">
             <div class="form-group">
-              <label for="physics_marks_11">Physics (11th):</label>
+              <label for="physics_marks_11">Physics (Theory) (11th):</label>
               <input type="number" id="physics_marks_11" name="physics_marks_11" value="{{ enquiry.physics_marks_11 | default('', true) }}" step="any">
             </div>
             <div class="form-group">
-              <label for="chemistry_marks_11">Chemistry (11th):</label>
-              <input type="number" id="chemistry_marks_11" name="chemistry_marks_11" value="{{ enquiry.chemistry_marks_11 | default('', true) }}" step="any">
+              <label for="physics_marks_11_practical">Physics (Practical) (11th):</label>
+              <input type="number" id="physics_marks_11_practical" name="physics_marks_11_practical" value="{{ enquiry.physics_marks_11_practical | default('', true) }}" step="any">
             </div>
             <div class="form-group">
-              <label for="mathematics_marks_11">Mathematics (11th):</label>
-              <input type="number" id="mathematics_marks_11" name="mathematics_marks_11" value="{{ enquiry.mathematics_marks_11 | default('', true) }}" step="any">
+              <label for="chemistry_marks_11">Chemistry (Theory) (11th):</label>
+              <input type="number" id="chemistry_marks_11" name="chemistry_marks_11" value="{{ enquiry.chemistry_marks_11 | default('', true) }}" step="any">
+            </div>
+          </div>
+          <div class="row three-cols">
+            <div class="form-group">
+              <label for="chemistry_marks_11_practical">Chemistry (Practical) (11th):</label>
+              <input type="number" id="chemistry_marks_11_practical" name="chemistry_marks_11_practical" value="{{ enquiry.chemistry_marks_11_practical | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="mathematics_marks_11a">Mathematics (A) (11th):</label>
+              <input type="number" id="mathematics_marks_11a" name="mathematics_marks_11a" value="{{ enquiry.mathematics_marks_11a | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="mathematics_marks_11b">Mathematics (B) (11th):</label>
+              <input type="number" id="mathematics_marks_11b" name="mathematics_marks_11b" value="{{ enquiry.mathematics_marks_11b | default('', true) }}" step="any">
+            </div>
+          </div>
+          <div class="section-title">12th Standard Details <span style="color: red; font-size: 0.8em;">(For AP/Telangana students only)</span></div>
+          <div class="row three-cols">
+            <div class="form-group">
+              <label for="physics_marks_12">Physics (Theory) (12th):</label>
+              <input type="number" id="physics_marks_12" name="physics_marks_12" value="{{ enquiry.physics_marks | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="physics_marks_12_practical">Physics (Practical) (12th):</label>
+              <input type="number" id="physics_marks_12_practical" name="physics_marks_12_practical" value="{{ enquiry.physics_marks_12_practical | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="chemistry_marks_12">Chemistry (Theory) (12th):</label>
+              <input type="number" id="chemistry_marks_12" name="chemistry_marks_12" value="{{ enquiry.chemistry_marks | default('', true) }}" step="any">
+            </div>
+          </div>
+          <div class="row three-cols">
+            <div class="form-group">
+              <label for="chemistry_marks_12_practical">Chemistry (Practical) (12th):</label>
+              <input type="number" id="chemistry_marks_12_practical" name="chemistry_marks_12_practical" value="{{ enquiry.chemistry_marks_12_practical | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="mathematics_marks_12a">Mathematics (A) (12th):</label>
+              <input type="number" id="mathematics_marks_12a" name="mathematics_marks_12a" value="{{ enquiry.mathematics_marks_12a | default('', true) }}" step="any">
+            </div>
+            <div class="form-group">
+              <label for="mathematics_marks_12b">Mathematics (B) (12th):</label>
+              <input type="number" id="mathematics_marks_12b" name="mathematics_marks_12b" value="{{ enquiry.mathematics_marks_12b | default('', true) }}" step="any">
             </div>
           </div>
         </div>
@@ -422,10 +574,13 @@
           function toggle11thFields() {
             var board = document.getElementById('education_board').value;
             var section11th = document.getElementById('section11th');
+            var section12thStandard = document.getElementById('section12thStandard');
             if (board === 'AP/Telangana') {
               section11th.style.display = 'block';
+              section12thStandard.style.display = 'none';
             } else {
               section11th.style.display = 'none';
+              section12thStandard.style.display = 'flex';
             }
           }
           document.addEventListener('DOMContentLoaded', function() {
@@ -590,16 +745,8 @@
                   transform: scale(1.2);
                   accent-color: #007bff;
                 "
-                {%
-                if
-                course
-                in
-                current_preferences
-                %}
-                checked
-                {%
-                endif
-                %}
+                {% if course in current_preferences %}checked{% endif %}
+                class="print-hidden"
               />
               <label
                 for="course_{{ loop.index }}"
@@ -649,17 +796,8 @@
           {% endfor %}
         </div>
 
-        {% if course_preferences %}
-        <div class="section-title">Current Preferences (in order)</div>
-        <div class="preference-list">
-          {% for pref in course_preferences %}
-          <p>{{ pref.preference_order }}. {{ pref.course_name }}</p>
-          {% endfor %}
-        </div>
-        {% endif %}
-
         <div class="button-group">
-          <button type="submit">Save Changes</button>
+          <button type="submit" class="print-hidden">Save Changes</button>
         </div>
       </form>
 

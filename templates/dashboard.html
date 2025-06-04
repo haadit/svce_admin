@@ -160,40 +160,79 @@
     <div class="dashboard-container">
       <div class="header">
         <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button type="button" id="save-status-btn" style="background: #388bff; color: #fff; font-weight: 600; font-size: 1.08em; padding: 10px 28px; border-radius: 8px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; opacity: 0.6; pointer-events: none; margin-right: 0;">Save</button>
+          <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+        </div>
       </div>
 
       {% if connected %}
       <h3>Admission Enquiries:</h3>
       {% if enquiries %}
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Token No</th>
-              <th>Student Name</th>
-              <th>Student Mobile</th>
-              <th>Student Email</th>
-              <th>Total Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for enquiry in enquiries %}
-            <tr>
-              <td>
-                <a href="{{ url_for('edit_enquiry', enquiry_id=enquiry.id) }}"
-                  >{{ enquiry.token_number | default('', true) }}</a
-                >
-              </td>
-              <td>{{ enquiry.student_name | default('', true) }}</td>
-              <td>{{ enquiry.student_mobile | default('', true) }}</td>
-              <td>{{ enquiry.student_email | default('', true) }}</td>
-              <td>{{ enquiry.total_percentage | default('N/A', true) }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      <form method="POST" action="{{ url_for('dashboard') }}" id="status-form">
+        <input type="hidden" name="status_update" value="1" />
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Token No</th>
+                <th>Student Name</th>
+                <th>Student Mobile</th>
+                <th>Student Email</th>
+                <th>Total Percentage</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for enquiry in enquiries %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('edit_enquiry', enquiry_id=enquiry.id) }}"
+                    >{{ enquiry.token_number | default('', true) }}</a
+                  >
+                  <input type="hidden" name="enquiry_id_{{ loop.index }}" value="{{ enquiry.id }}" />
+                </td>
+                <td>{{ enquiry.student_name | default('', true) }}</td>
+                <td>{{ enquiry.student_mobile | default('', true) }}</td>
+                <td>{{ enquiry.student_email | default('', true) }}</td>
+                <td>{{ enquiry.total_percentage | default('N/A', true) }}</td>
+                <td>
+                  <select name="status_{{ loop.index }}" data-enquiry-id="{{ enquiry.id }}" class="status-dropdown" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #c7d2fe; background: #f8fafc; font-size: 1em; font-weight: 600;">
+                    <option value="Waiting for counseling" {% if enquiry.status == 'Waiting for counseling' %}selected{% endif %} style="color: #2563eb; background: #e0e7ff;">Waiting for counseling</option>
+                    <option value="Counciling done." {% if enquiry.status == 'Counciling done.' %}selected{% endif %} style="color: #059669; background: #d1fae5;">Counciling done.</option>
+                    <option value="booking done." {% if enquiry.status == 'booking done.' %}selected{% endif %} style="color: #ea580c; background: #ffedd5;">booking done.</option>
+                    <option value="need to follow up." {% if enquiry.status == 'need to follow up.' %}selected{% endif %} style="color: #dc2626; background: #fee2e2;">need to follow up.</option>
+                  </select>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </form>
+      <script>
+        // Save button logic in header triggers main form submit
+        const form = document.getElementById('status-form');
+        const saveBtn = document.getElementById('save-status-btn');
+        const dropdowns = document.querySelectorAll('.status-dropdown');
+        let changed = false;
+        dropdowns.forEach(function(drop) {
+          drop.addEventListener('change', function() {
+            changed = true;
+            saveBtn.style.opacity = 1;
+            saveBtn.style.pointerEvents = 'auto';
+          });
+        });
+        saveBtn.addEventListener('click', function() {
+          if (changed) {
+            form.submit();
+          }
+        });
+        form.addEventListener('submit', function() {
+          saveBtn.style.opacity = 0.6;
+          saveBtn.style.pointerEvents = 'none';
+        });
+      </script>
       {% else %}
       <p>No admission enquiries found.</p>
       {% endif %} {% else %}

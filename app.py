@@ -53,11 +53,27 @@ def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 @require_admin
 def dashboard():
+    error_message = None
+    if request.method == 'POST' and request.form.get('status_update'):
+        # Handle status updates
+        try:
+            updates = []
+            for key in request.form:
+                if key.startswith('enquiry_id_'):
+                    idx = key.split('_')[-1]
+                    enquiry_id = request.form[key]
+                    status_key = f'status_{idx}'
+                    status_val = request.form.get(status_key)
+                    if enquiry_id and status_val:
+                        updates.append((enquiry_id, status_val))
+            for enquiry_id, status_val in updates:
+                supabase.table('admission_enquiries').update({'status': status_val}).eq('id', enquiry_id).execute()
+        except Exception as e:
+            error_message = f"Error updating status: {e}"
     try:
-        error_message = None
         data = supabase.from_('admission_enquiries').select('*').order('token_number').execute()
         enquiries = data.data if data and data.data else []
         connected = True
@@ -132,8 +148,17 @@ def edit_enquiry(enquiry_id):
                 'physics_marks': form_data.get('physics_marks') or None,
                 'chemistry_marks': form_data.get('chemistry_marks') or None,
                 'mathematics_marks': form_data.get('mathematics_marks') or None,
+                'physics_marks_11': form_data.get('physics_marks_11') or None,
+                'chemistry_marks_11': form_data.get('chemistry_marks_11') or None,
+                'mathematics_marks_12a': form_data.get('mathematics_marks_12a') or None,
+                'mathematics_marks_12b': form_data.get('mathematics_marks_12b') or None,
+                'mathematics_marks_11a': form_data.get('mathematics_marks_11a') or None,
+                'mathematics_marks_11b': form_data.get('mathematics_marks_11b') or None,
+                'physics_marks_11_practical': form_data.get('physics_marks_11_practical') or None,
+                'chemistry_marks_11_practical': form_data.get('chemistry_marks_11_practical') or None,
+                'physics_marks_12_practical': form_data.get('physics_marks_12_practical') or None,
+                'chemistry_marks_12_practical': form_data.get('chemistry_marks_12_practical') or None,
                 'cs_marks': form_data.get('cs_marks') or None,
-                'bio_marks': form_data.get('bio_marks') or None,
                 'ece_marks': form_data.get('ece_marks') or None,
                 'pcm_percentage': form_data.get('pcm_percentage') or None,
                 'total_percentage': form_data.get('total_percentage') or None,
