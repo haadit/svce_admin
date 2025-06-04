@@ -167,6 +167,13 @@ def edit_enquiry(enquiry_id):
                 'cet_rank': form_data.get('cet_rank') or None,
                 'updated_at': datetime.now().isoformat()
             }
+            # Set enquiry_date to current date if not provided, otherwise use form value
+            enquiry_date_val = form_data.get('enquiry_date')
+            if enquiry_date_val:
+                enquiry_update_data['enquiry_date'] = enquiry_date_val
+            else:
+                enquiry_update_data['enquiry_date'] = datetime.now().date().isoformat() # Use current date
+
             # Handle Course Preferences Update (JSON)
             selected_courses = request.form.getlist('course_preference')
             course_orders = []
