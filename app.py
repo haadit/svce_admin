@@ -160,6 +160,9 @@ def edit_enquiry(enquiry_id):
                 'chemistry_marks_12_practical': form_data.get('chemistry_marks_12_practical') or None,
                 'cs_marks': form_data.get('cs_marks') or None,
                 'ece_marks': form_data.get('ece_marks') or None,
+                'kannada_marks': form_data.get('kannada_marks') or None,
+                'english_marks': form_data.get('english_marks') or None,
+                'other_subject_marks': form_data.get('other_subject_marks') or None,
                 'pcm_percentage': form_data.get('pcm_percentage') or None,
                 'total_percentage': form_data.get('total_percentage') or None,
                 'jee_rank': form_data.get('jee_rank') or None,
@@ -197,6 +200,21 @@ def edit_enquiry(enquiry_id):
         # GET or POST with error: Fetch current data
         data = supabase.from_('admission_enquiries').select('*').eq('id', enquiry_id).single().execute()
         enquiry = data.data if data and data.data else None
+        # Format created_at timestamp for display
+        if enquiry and isinstance(enquiry.get('created_at'), str):
+            try:
+                # Attempt to parse the ISO 8601 string, handling potential variations
+                # Replace 'Z' with '+00:00' if necessary, though fromisoformat is robust
+                timestamp_str = enquiry['created_at'].replace('Z', '+00:00')
+                # Handle potential space instead of 'T' in ISO format
+                timestamp_str = timestamp_str.replace(' ', 'T', 1)
+                created_at_dt = datetime.fromisoformat(timestamp_str)
+                # Format into "DD Mon YYYY HH:MM:SS (offset)"
+                enquiry['created_at'] = created_at_dt.strftime("%d %b %Y %H:%M:%S")
+            except (ValueError, TypeError) as e:
+                print(f"Error parsing or formatting created_at: {e} - Value: {enquiry.get('created_at')}")
+                enquiry['created_at'] = 'N/A'
+
         # Prepare current_preferences and course_preferences_list for template
         current_preferences = {}
         course_preferences_list = []

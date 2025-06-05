@@ -19,6 +19,7 @@
         border-radius: 18px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border-top: 4px solid #388bff;
+        position: relative;
       }
       h2 {
         text-align: center;
@@ -56,6 +57,30 @@
       input[type="number"]:focus,
       input[type="date"]:focus,
       textarea:focus {
+        border: 1.5px solid #007bff;
+        outline: none;
+        background: #fff;
+      }
+      .styled-select {
+        width: 100%;
+        padding: 12px;
+        border: 1.5px solid #c7d2fe;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 1.05em;
+        background: #f8fafc;
+        transition: border 0.2s;
+        appearance: none; /* Remove default browser styling */
+        -webkit-appearance: none; /* Remove default browser styling for Webkit browsers */
+        -moz-appearance: none; /* Remove default browser styling for Firefox */
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2C114.1L145.2%2C26.4c-6.6-6.6-17-6.6-23.6%2C0L6.4%2C114.1c-6.6%2C6.6-6.6%2C17%2C0%2C23.6l23.6%2C23.6c6.7%2C6.7%2C17.2%2C6.7%2C23.9%2C0l96.2-96.2l96.2%2C96.2c6.7%2C6.7%2C17.2%2C6.7%2C23.9%2C0l23.6-23.6C293.6%2C131.1%2C293.6%2C120.7%2C287%2C114.1z%22%2F%3E%3C%2Fsvg%3E'); /* Add a custom arrow icon */
+        background-repeat: no-repeat;
+        background-position: right 12px top 50%;
+        background-size: 12px auto;
+        display: block;
+        height: auto;
+      }
+      .styled-select:focus {
         border: 1.5px solid #007bff;
         outline: none;
         background: #fff;
@@ -106,7 +131,7 @@
         margin-top: 6px !important;
         text-align: right !important;
       }
-      button,
+      button, 
       .print-btn {
         background-color: #007bff;
         color: white;
@@ -119,7 +144,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
         transition: background 0.2s;
       }
-      button:hover,
+      button:hover, 
       .print-btn:hover {
         background-color: #0056b3;
       }
@@ -170,182 +195,246 @@
       .selected-course-row {
         background: #e6f2ff !important;
       }
+      /* Status Colors */
+      .status-waiting {
+          color: #2563eb;
+          background-color: #e0e7ff;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-weight: 600;
+      }
+      .status-counseling-done {
+          color: #059669;
+          background-color: #d1fae5;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-weight: 600;
+      }
+      .status-booking-done {
+          color: #ea580c;
+          background-color: #ffedd5;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-weight: 600;
+      }
+      .status-follow-up {
+          color: #dc2626;
+          background-color: #fee2e2;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-weight: 600;
+      }
+      /* Hide elements on screen, show only in print */
+      .created-at-print {
+          display: block; /* Visible by default */
+          font-size: 1.1rem;
+          font-weight: 500;
+          color: #222;
+          /* margin-bottom: 10px; /* Adjust if needed after positioning */
+          position: absolute;
+          top: 10px; /* Position from the top edge */
+          right: 38px; /* Position from the right edge, aligned with container padding */
+          z-index: 10; /* Ensure it's above other content */
+          padding: 5px 10px; /* Add some padding around the text */
+          border-radius: 6px; /* Match other rounded corners */
+          background-color: #e9f5ff; /* Light blue background */
+          border: 1px solid #b3e0ff; /* Light blue border */
+      }
+      .created-at-print span {
+          background: #f4f6fa; 
+          padding: 4px 10px; 
+          border-radius: 6px; 
+          font-weight: 600;
+      }
+      /* General print adjustments */
       @media print {
-        .print-btn,
-        .back-link {
-          display: none !important;
-        }
-        body {
-          background: #fff !important;
-          font-size: 10.9px !important;
-          margin: 0 !important;
-        }
-        .container {
-          box-shadow: none !important;
-          border: none !important;
-          margin: 0 !important;
-          padding: 3px 6px 3px 6px !important;
-          max-width: 100vw !important;
-        }
-        .row, .row.three-cols, .row.four-cols, .row.two-cols {
-          gap: 2px !important;
-          margin-bottom: 2px !important;
-        }
-        .form-group {
-          margin-bottom: 2px !important;
-        }
-        .section-title {
-          font-size: 0.95em !important;
-          margin-top: 5px !important;
-          margin-bottom: 2px !important;
-          padding-bottom: 0 !important;
-        }
-        input, textarea, select {
-          font-size: 0.95em !important;
-          padding: 2px 4px !important;
-        }
-        label {
-          font-size: 0.95em !important;
-          margin-bottom: 1px !important;
-        }
-        h2, .header-title {
-          font-size: 1.05em !important;
-          margin: 0 !important;
-        }
-        img[alt="College Logo"] {
-          max-width: 37% !important;
-          width: 50% !important;
-          margin-bottom: 4px !important;
-          padding: 0 !important;
-          box-shadow: none !important;
-          border-radius: 0 !important;
-          background: none !important;
-        }
-        .info-box, .preference-list, .checkbox-group {
-          padding: 2px !important;
-          margin-bottom: 2px !important;
-          min-height: 0 !important;
-          box-sizing: border-box !important;
-        }
-        textarea {
-          min-height: 30px !important;
-        }
-        .checkbox-group {
-          display: block !important;
-          border: 1px solid #c7d2fe !important;
-          background: #f8fafc !important;
-          border-radius: 6px !important;
-          padding: 2px 2px 2px 2px !important;
-          margin-top: 1px !important;
-        }
-        .checkbox-group > div {
-          margin-bottom: 1px !important;
-          padding: 0 !important;
-          border-radius: 4px !important;
-          border: none !important;
-          background: none !important;
-        }
-        .checkbox-group > div:last-child {
-          margin-bottom: 0 !important;
-        }
-        .button-group {
-          margin-top: 6px !important;
-        }
-        .error-message {
-          margin-bottom: 2px !important;
-          padding: 2px !important;
-        }
-        .print-hidden {
-          display: none !important;
-        }
-        .checkbox-group input[type="number"] { display: none !important; }
-        .checkbox-group input[type="checkbox"] { display: none !important; }
-        .checkbox-group span[style*="border-radius: 50%"] {
-          margin-right: 2px !important;
-          width: 18px !important;
-          height: 18px !important;
-          font-size: 0.7em !important;
-        }
-        .checkbox-group label {
-          font-size: 0.9em !important;
-          margin-bottom: 0 !important;
-        }
-        .checkbox-group > div {
-          grid-template-columns: auto 1fr !important;
-          gap: 4px !important;
-          align-items: center !important;
-          margin-bottom: 1px !important;
-        }
-        .checkbox-group {
-           border: none !important;
-           background: none !important;
-           padding: 0 !important;
-           margin-top: 1px !important;
-           margin-bottom: 2px !important;
-        }
-        .mandatory-note { display: none !important; }
-        .container > div:first-child span,
-        .container > div:nth-child(2) div:first-child,
-        .container > div:nth-child(2) div:nth-child(2),
-        .container > div:nth-child(2) div:last-child {
-          font-size: 0.95em !important;
-          letter-spacing: 0.5px !important;
-        }
-        .container > div:nth-child(2) div:first-child span,
-        .container > div:nth-child(2) div:last-child input {
-          font-size: 0.95em !important;
-          padding: 1px 4px !important;
-        }
-        label {
-          font-size: 0.95em !important;
-          margin-bottom: 1px !important;
-        }
-        input[type="text"], input[type="email"], input[type="number"], input[type="date"], textarea, select {
-          font-size: 0.85em !important;
-          padding: 2px 4px !important;
-        }
-      }
-      @media (max-width: 900px) {
-        .container {
-          margin: 10px;
-          padding: 12px;
-          width: calc(100% - 10px);
-        }
-        h2 {
-          font-size: 1.4rem;
-        }
-        .section-title {
-          font-size: 1.05rem;
-        }
-        input,
-        textarea {
-          font-size: 0.98em;
-        }
-      }
-      .styled-select {
-        width: 100%;
-        padding: 12px;
-        border: 1.5px solid #c7d2fe;
-        border-radius: 6px;
-        background: #f8fafc;
-        font-size: 1.05em;
-        color: #2d3a4a;
-        transition: border 0.2s;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        background-size: 22px 22px;
-      }
-      .styled-select:focus {
-        border: 1.5px solid #007bff;
-        outline: none;
-        background: #fff;
-      }
-      @media print {
-        .print-hidden { display: none !important; }
+          @page {
+              margin: 0.5cm; /* Adjust margins for printing */
+          }
+          /* Hide non-essential elements for print */
+          .button-group,
+          .print-btn,
+          .back-link,
+          .mandatory-note,
+          .info-box,
+          .print-hidden {
+              display: none !important;
+          }
+          /* Show created_at timestamp */
+          .created-at-print {
+              display: flex !important;
+              visibility: visible !important;
+              justify-content: flex-end !important; /* Align to the right */
+              width: 100% !important;
+              margin-top: 0 !important;
+              margin-bottom: 10px !important;
+              position: static !important; /* Remove absolute positioning for print */
+              text-align: right !important; /* Ensure right alignment in print flow */
+              z-index: 9999 !important; /* Ensure it stacks on top */
+              box-sizing: border-box !important;
+          }
+          /* Ensure logo fills width and other print styles are correct */
+          img[alt="College Logo"] {
+              max-width: 220px !important; /* Further reduce the max width for print */
+              width: 220px !important; /* Further reduce the width for print */
+              margin-bottom: 4px !important; /* Add space below logo */
+              padding: 0 !important; /* Remove padding around logo */
+              box-shadow: none !important; /* Remove shadow for print */
+              border-radius: 0 !important; /* Remove border radius for print */
+              background: none !important; /* Remove background for print */
+          }
+          body {
+            background: #fff !important;
+            font-size: 10.0px !important; /* Adjusted base font size for readability */
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .container {
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important; /* Ensure no margin on container */
+            padding: 4px !important; /* Adjusted container padding */
+            max-width: 100vw !important;
+            width: auto !important;
+          }
+          .row, .row.three-cols, .row.four-cols, .row.two-cols {
+              gap: 2.5px !important; /* Adjusted gap */
+              margin-bottom: 2.5px !important; /* Adjusted margin */
+          }
+          .styled-select {
+            width: 100%;
+            padding: 3px !important; /* Adjusted padding for select */
+            border: 1.5px solid #c7d2fe;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1.0em !important; /* Adjusted font size for select */
+            background: #f8fafc;
+            transition: border 0.2s;
+            appearance: none; /* Remove default browser styling */
+            -webkit-appearance: none; /* Remove default browser styling for Webkit browsers */
+            -moz-appearance: none; /* Remove default browser styling for Firefox */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2C114.1L145.2%2C26.4c-6.6-6.6-17-6.6-23.6%2C0L6.4%2C114.1c-6.6%2C6.6-6.6%2C17%2C0%2C23.6l23.6%2C23.6c6.7%2C6.7%2C17.2%2C6.7%2C23.9%2C0l96.2-96.2l96.2%2C96.2c6.7%2C6.7%2C17.2%2C6.7%2C23.9%2C0l23.6-23.6C293.6%2C131.1%2C293.6%2C120.7%2C287%2C114.1z%22%2F%3E%3C%2Fsvg%3E'); /* Add a custom arrow icon */
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 12px auto;
+            display: block; /* Ensure it takes the full width in the grid */
+            height: auto; /* Adjust height automatically based on content and padding */
+          }
+          .form-group {
+              margin-bottom: 4px !important; /* Adjusted margin for form groups */
+          }
+          .section-title {
+              font-size: 0.9em !important; /* Reduced section title size */
+              margin-top: 5px !important; /* Reduced margin */
+              margin-bottom: 2.5px !important; /* Reduced margin */
+              padding-bottom: 0px !important;
+          }
+          input, textarea, select {
+              font-size: 0.9em !important; /* Adjusted text size in fields */
+              padding: 3px 5px !important; /* Adjusted padding */
+          }
+          label {
+              font-size: 0.9em !important; /* Adjusted label size */
+              margin-bottom: 1px !important; /* Adjusted margin */
+          }
+          h2, .header-title { /* Adjust main title for print */
+              font-size: 1.05em !important; /* Reduced main title size */
+              margin: 0 0 3px 0 !important; /* Reduced margin */
+              text-align: center;
+          }
+          .preference-list, .checkbox-group {
+              padding: 4px !important; /* Adjusted padding */
+              margin-bottom: 6px !important; /* Adjusted margin */
+              min-height: 0 !important;
+              box-sizing: border-box !important;
+          }
+          textarea {
+              min-height: 22px !important; /* Adjusted min height */
+          }
+          .checkbox-group {
+             display: block !important;
+             border: 1px solid #c7d2fe !important;
+             background: #f8fafc !important;
+             border-radius: 6px !important;
+             padding: 3px !important; /* Adjusted padding */
+             margin-top: 4px !important; /* Adjusted margin */
+             margin-bottom: 4px !important; /* Adjusted margin */
+          }
+          .checkbox-group > div {
+            margin-bottom: 1.5px !important; /* Adjusted margin */
+            padding: 0 !important;
+            border-radius: 4px !important;
+            border: none !important;
+            background: none !important;
+          }
+          .checkbox-group > div:last-child {
+            margin-bottom: 0 !important; /* Ensure no margin on last item */
+          }
+          .error-message {
+            margin-bottom: 4px !important; /* Adjusted margin */
+            padding: 4px !important; /* Adjusted padding */
+          }
+          .checkbox-group input[type="number"] { display: none !important; }
+          .checkbox-group input[type="checkbox"] { display: none !important; }
+          .checkbox-group span[style*="border-radius: 50%"] {
+            margin-right: 3px !important; /* Adjusted margin */
+            width: 14px !important; /* Reduced size */
+            height: 14px !important; /* Reduced size */
+            font-size: 0.9em !important; /* Reduced font size */
+          }
+          .checkbox-group label {
+            font-size: 0.9em !important; /* Adjusted font size */
+            margin-bottom: 0 !important; /* Ensure no margin */
+            color: #333; /* Ensure label color is readable */
+          }
+          .checkbox-group > div {
+             grid-template-columns: auto 1fr !important; /* Maintain grid structure */
+             gap: 2.5px !important; /* Adjusted gap */
+             align-items: center !important;
+             margin-bottom: 1.5px !important; /* Adjusted margin */
+          }
+          .checkbox-group {
+             border: none !important;
+             background: none !important;
+             padding: 0 !important;
+             margin-top: 3px !important; /* Adjusted margin */
+             margin-bottom: 3px !important; /* Adjusted margin */
+          }
+          /* Ensure elements hidden on screen are still hidden in print unless explicitly shown */
+          .hide-on-print:not(.created-at-print) {
+              display: none !important;
+          }
+          /* Adjust created_at for print */
+          .created-at-print {
+              font-size: 0.9em !important; /* Adjusted font size */
+              padding: 0 !important; /* Remove padding */
+              border: none !important; /* Remove border */
+              background-color: transparent !important; /* Remove background */
+          }
+          .created-at-print span {
+              padding: 0 !important;
+              border-radius: 0 !important; /* Remove span border-radius */
+              background: none !important; /* Remove span background */
+              font-weight: normal !important; /* Adjust font weight */
+          }
+          /* Ensure details section is visible and laid out correctly in print */
+          .details-section {
+              display: flex !important;
+              visibility: visible !important;
+              width: 100% !important;
+              justify-content: space-between !important;
+              align-items: center !important;
+              margin-bottom: 4px !important; /* Adjusted margin */
+              margin-top: 4px !important; /* Adjusted margin */
+              z-index: 9999 !important; /* Ensure it stacks on top */
+              font-size: 0.9em !important; /* Adjusted font size for labels */
+          }
+          .details-section span, /* Target the value spans */
+          .details-section input[type="date"] /* Target the date input */ {
+              font-size: 0.9em !important; /* Adjusted font size for values */
+              padding: 1px 3px !important; /* Adjusted padding */
+              background: none !important; /* Remove background for print */
+          }
       }
     </style>
     <link
@@ -355,17 +444,23 @@
   </head>
   <body>
     <div class="container">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 18px;">
+      <div class="header-section" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 18px;">
         <img src="{{ url_for('static', filename='college_logo.png') }}" alt="College Logo" style="max-width: 380px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 8px;" />
         <div style="display: flex; gap: 12px; align-items: center;">
           <a href="{{ url_for('dashboard') }}" class="back-link" style="margin-bottom: 0; background: #e3edff; color: #1a237e; padding: 10px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 1.08em; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: background 0.2s;">&larr; Back to Dashboard</a>
           <button type="button" onclick="window.print()" class="print-btn" style="font-size: 1.1em; font-weight: 600; padding: 12px 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #388bff;"> <i class="fa fa-print"></i> Print</button>
         </div>
       </div>
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; margin-top: 8px;">
-        <div style="font-size: 1.1rem; font-weight: 500; color: #222;">Token No.: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.token_number | default('', true) }}</span></div>
-        <div style="font-size: 1.1rem; font-weight: 600; color: #2d3a4a; letter-spacing: 1px; text-align: center;">ADMISSION ENQUIRY FORM</div>
-        <div style="font-size: 1.1rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
+      <div class="details-section" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; margin-top: 8px;">
+        <div style="font-size: 0.9rem; font-weight: 500; color: #222;">Token No.: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.token_number | default('', true) }}</span></div>
+        <div style="font-size: 0.9rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">Status: 
+            <span
+                class="{% if enquiry.status == 'Waiting for counseling' %}status-waiting{% elif enquiry.status == 'Counciling done.' %}status-counseling-done{% elif enquiry.status == 'booking done.' %}status-booking-done{% elif enquiry.status == 'need to follow up.' %}status-follow-up{% endif %}"
+            >
+                {{ enquiry.status | default('N/A', true) }}
+            </span>
+        </div>
+        <div style="font-size: 0.8rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
           <label for="enquiry_date" style="margin: 0; font-weight: 500;">Date:</label>
           <input
             type="date"
@@ -386,6 +481,10 @@
       {% else %} {% if error %}
       <p class="error-message">Error: {{ error }}</p>
       {% endif %}
+
+      <div class="created-at-print">
+          Created At: <span>{{ enquiry.created_at | default('N/A', true) }}</span>
+      </div>
 
       <form method="POST">
         <div class="row">
@@ -479,7 +578,7 @@
           </div>
         </div>
 
-        <div class="section-title">12th Standard Marks</div>
+        <div class="section-title">12th Standard: (Physics, Chemistry, and Mathematics are mandatory)</div>
         <p class="mandatory-note" style="color: red; font-size: 0.9em;">(Physics, Chemistry, and Mathematics are mandatory)</p>
         <div class="row three-cols" id="section12thStandard">
           <div class="form-group">
@@ -540,55 +639,55 @@
               <input type="number" id="mathematics_marks_11b" name="mathematics_marks_11b" value="{{ enquiry.mathematics_marks_11b | default('', true) }}" step="any">
             </div>
           </div>
-          <div class="section-title">12th Standard Details <span style="color: red; font-size: 0.8em;">(For AP/Telangana students only)</span></div>
-          <div class="row three-cols">
-            <div class="form-group">
-              <label for="physics_marks_12">Physics (Theory) (12th):</label>
-              <input type="number" id="physics_marks_12" name="physics_marks_12" value="{{ enquiry.physics_marks | default('', true) }}" step="any">
-            </div>
-            <div class="form-group">
-              <label for="physics_marks_12_practical">Physics (Practical) (12th):</label>
-              <input type="number" id="physics_marks_12_practical" name="physics_marks_12_practical" value="{{ enquiry.physics_marks_12_practical | default('', true) }}" step="any">
-            </div>
-            <div class="form-group">
-              <label for="chemistry_marks_12">Chemistry (Theory) (12th):</label>
-              <input type="number" id="chemistry_marks_12" name="chemistry_marks_12" value="{{ enquiry.chemistry_marks | default('', true) }}" step="any">
-            </div>
-          </div>
-          <div class="row three-cols">
-            <div class="form-group">
-              <label for="chemistry_marks_12_practical">Chemistry (Practical) (12th):</label>
-              <input type="number" id="chemistry_marks_12_practical" name="chemistry_marks_12_practical" value="{{ enquiry.chemistry_marks_12_practical | default('', true) }}" step="any">
-            </div>
-            <div class="form-group">
-              <label for="mathematics_marks_12a">Mathematics (A) (12th):</label>
-              <input type="number" id="mathematics_marks_12a" name="mathematics_marks_12a" value="{{ enquiry.mathematics_marks_12a | default('', true) }}" step="any">
-            </div>
-            <div class="form-group">
-              <label for="mathematics_marks_12b">Mathematics (B) (12th):</label>
-              <input type="number" id="mathematics_marks_12b" name="mathematics_marks_12b" value="{{ enquiry.mathematics_marks_12b | default('', true) }}" step="any">
-            </div>
-          </div>
-        </div>
-        <script>
-          function toggle11thFields() {
-            var board = document.getElementById('education_board').value;
-            var section11th = document.getElementById('section11th');
-            var section12thStandard = document.getElementById('section12thStandard');
-            if (board === 'AP/Telangana') {
-              section11th.style.display = 'block';
-              section12thStandard.style.display = 'none';
-            } else {
-              section11th.style.display = 'none';
-              section12thStandard.style.display = 'flex';
-            }
-          }
-          document.addEventListener('DOMContentLoaded', function() {
-            toggle11thFields();
-          });
-        </script>
+           <div class="section-title">12th Standard Details <span style="color: red; font-size: 0.8em;">(For AP/Telangana students only)</span></div>
+           <div class="row three-cols">
+             <div class="form-group">
+               <label for="physics_marks_12">Physics (Theory) (12th):</label>
+               <input type="number" id="physics_marks_12" name="physics_marks_12" value="{{ enquiry.physics_marks | default('', true) }}" step="any">
+             </div>
+             <div class="form-group">
+               <label for="physics_marks_12_practical">Physics (Practical) (12th):</label>
+               <input type="number" id="physics_marks_12_practical" name="physics_marks_12_practical" value="{{ enquiry.physics_marks_12_practical | default('', true) }}" step="any">
+             </div>
+             <div class="form-group">
+               <label for="chemistry_marks_12">Chemistry (Theory) (12th):</label>
+               <input type="number" id="chemistry_marks_12" name="chemistry_marks_12" value="{{ enquiry.chemistry_marks | default('', true) }}" step="any">
+             </div>
+           </div>
+           <div class="row three-cols">
+             <div class="form-group">
+               <label for="chemistry_marks_12_practical">Chemistry (Practical) (12th):</label>
+               <input type="number" id="chemistry_marks_12_practical" name="chemistry_marks_12_practical" value="{{ enquiry.chemistry_marks_12_practical | default('', true) }}" step="any">
+             </div>
+             <div class="form-group">
+               <label for="mathematics_marks_12a">Mathematics (A) (12th):</label>
+               <input type="number" id="mathematics_marks_12a" name="mathematics_marks_12a" value="{{ enquiry.mathematics_marks_12a | default('', true) }}" step="any">
+             </div>
+             <div class="form-group">
+               <label for="mathematics_marks_12b">Mathematics (B) (12th):</label>
+               <input type="number" id="mathematics_marks_12b" name="mathematics_marks_12b" value="{{ enquiry.mathematics_marks_12b | default('', true) }}" step="any">
+             </div>
+           </div>
+         </div>
+         <script>
+           function toggle11thFields() {
+             var board = document.getElementById('education_board').value;
+             var section11th = document.getElementById('section11th');
+             var section12thStandard = document.getElementById('section12thStandard');
+             if (board === 'AP/Telangana') {
+               section11th.style.display = 'block';
+               section12thStandard.style.display = 'none';
+             } else {
+               section11th.style.display = 'none';
+               section12thStandard.style.display = 'flex';
+             }
+           }
+           document.addEventListener('DOMContentLoaded', function() {
+             toggle11thFields();
+           });
+         </script>
 
-        <div class="section-title">CS: (Optional)</div>
+        <div class="section-title">CS, BIO, ECE (Optional)</div>
         <div class="row three-cols">
           <div class="form-group">
             <label for="cs_marks">CS: (Optional)</label>
@@ -621,6 +720,41 @@
             />
           </div>
         </div>
+        <div class="section-title">Kannada, English, Other Subjects (Optional)</div>
+        <div class="row three-cols">
+            <div class="form-group">
+                <label for="kannada_marks">Kannada: (Optional)</label>
+                <input
+                    type="number"
+                    id="kannada_marks"
+                    name="kannada_marks"
+                    value="{{ enquiry.kannada_marks | default('', true) }}"
+                    step="any"
+                />
+            </div>
+            <div class="form-group">
+                <label for="english_marks">English: (Optional)</label>
+                <input
+                    type="number"
+                    id="english_marks"
+                    name="english_marks"
+                    value="{{ enquiry.english_marks | default('', true) }}"
+                    step="any"
+                />
+            </div>
+            <div class="form-group">
+                <label for="other_subject_marks">Other Subject Marks: (Optional)</label>
+                <input
+                    type="number"
+                    id="other_subject_marks"
+                    name="other_subject_marks"
+                    value="{{ enquiry.other_subject_marks | default('', true) }}"
+                    step="any"
+                />
+            </div>
+        </div>
+
+        <div class="section-title">Percentage Details</div>
         <div class="row two-cols">
           <div class="form-group">
             <label for="total_percentage">Total Percentage:</label>
@@ -703,105 +837,105 @@
               {% if course in current_preferences %}
               <span
                 style="
-                  display: inline-flex;
-                  align-items: center;
-                  justify-content: center;
-                  width: 32px;
-                  height: 32px;
-                  background: #007bff;
-                  color: #fff;
-                  font-weight: bold;
-                  border-radius: 50%;
-                  font-size: 1.08em;
-                  margin-right: 14px;
-                "
-                >{{ current_preferences[course].preference_order }}</span
-              >
-              {% else %}
-              <span
-                style="
-                  display: inline-flex;
-                  align-items: center;
-                  justify-content: center;
-                  width: 32px;
-                  height: 32px;
-                  background: #e0e7ff;
-                  color: #b0b7c3;
-                  font-weight: bold;
-                  border-radius: 50%;
-                  font-size: 1.08em;
-                  margin-right: 14px;
-                "
-                >&ndash;</span
-              >
-              {% endif %}
-              <input
-                type="checkbox"
-                name="course_preference"
-                value="{{ course }}"
-                id="course_{{ loop.index }}"
-                style="
-                  margin-right: 12px;
-                  transform: scale(1.2);
-                  accent-color: #007bff;
-                "
-                {% if course in current_preferences %}checked{% endif %}
-                class="print-hidden"
-              />
-              <label
-                for="course_{{ loop.index }}"
-                style="
-                  flex: 1;
-                  font-size: 1.08em;
-                  font-weight: 500;
-                  margin-bottom: 0;
-                  cursor: pointer;
-                  color: #222;
-                "
-              >
-                {{ course }}
-              </label>
-            </div>
-            {% if course in current_preferences %}
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              "
-            >
-              <input
-                type="number"
-                name="preference_order_{{ course|replace(' ', '_')|replace('(', '')|replace(')', '')|replace('.', '') }}"
-                min="1"
-                style="
-                  width: 55px;
-                  height: 36px;
-                  font-size: 1.2em;
-                  border: 2px solid #007bff;
-                  border-radius: 7px;
-                  text-align: center;
-                  background: #f8fafc;
-                  color: #007bff;
-                  font-weight: bold;
-                "
-                value="{{ current_preferences[course].preference_order }}"
-                required
-              />
-            </div>
-            {% else %}
-            <div></div>
-            {% endif %}
-          </div>
-          {% endfor %}
-        </div>
+                   display: inline-flex;
+                   align-items: center;
+                   justify-content: center;
+                   width: 32px;
+                   height: 32px;
+                   background: #007bff;
+                   color: #fff;
+                   font-weight: bold;
+                   border-radius: 50%;
+                   font-size: 1.08em;
+                   margin-right: 14px;
+                 "
+                 >{{ current_preferences[course].preference_order }}</span
+               >
+               {% else %}
+               <span
+                 style="
+                   display: inline-flex;
+                   align-items: center;
+                   justify-content: center;
+                   width: 32px;
+                   height: 32px;
+                   background: #e0e7ff;
+                   color: #b0b7c3;
+                   font-weight: bold;
+                   border-radius: 50%;
+                   font-size: 1.08em;
+                   margin-right: 14px;
+                 "
+                 >&ndash;</span
+               >
+               {% endif %}
+               <input
+                 type="checkbox"
+                 name="course_preference"
+                 value="{{ course }}"
+                 id="course_{{ loop.index }}"
+                 style="
+                   margin-right: 12px;
+                   transform: scale(1.2);;
+                   accent-color: #007bff;
+                 "
+                 {% if course in current_preferences %}checked{% endif %}
+                 class="print-hidden"
+               />
+               <label
+                 for="course_{{ loop.index }}"
+                 style="
+                   flex: 1;
+                   font-size: 1.08em;
+                   font-weight: 500;
+                   margin-bottom: 0;
+                   cursor: pointer;
+                   color: #222;
+                 "
+               >
+                 {{ course }}
+               </label>
+             </div>
+             {% if course in current_preferences %}
+             <div
+               style="
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+               "
+             >
+               <input
+                 type="number"
+                 name="preference_order_{{ course|replace(' ', '_')|replace('(', '')|replace(')', '')|replace('.', '') }}"
+                 min="1"
+                 style="
+                   width: 55px;
+                   height: 36px;
+                   font-size: 1.2em;
+                   border: 2px solid #007bff;
+                   border-radius: 7px;
+                   text-align: center;
+                   background: #f8fafc;
+                   color: #007bff;
+                   font-weight: bold;
+                 "
+                 value="{{ current_preferences[course].preference_order }}"
+                 required
+               />
+             </div>
+             {% else %}
+             <div></div>
+             {% endif %}
+           </div>
+           {% endfor %}
+         </div>
 
-        <div class="button-group">
-          <button type="submit" class="print-hidden">Save Changes</button>
-        </div>
-      </form>
+         <div class="button-group">
+           <button type="submit" class="print-hidden">Save Changes</button>
+         </div>
+       </form>
 
-      {% endif %}
-    </div>
-  </body>
-</html>
+       {% endif %}
+     </div>
+   </body>
+ </html>

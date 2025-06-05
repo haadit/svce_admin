@@ -105,6 +105,19 @@
       tr:hover td {
         background: #dbeafe;
       }
+      /* Status Row Colors */
+      .row-waiting td {
+        background-color: #e0e7ff !important; /* Light blue */
+      }
+      .row-counseling-done td {
+        background-color: #d1fae5 !important; /* Light green */
+      }
+      .row-booking-done td {
+        background-color: #ffedd5 !important; /* Light orange */
+      }
+      .row-follow-up td {
+        background-color: #fee2e2 !important; /* Light red */
+      }
       td {
         color: #2d3a4a;
         font-size: 1.04em;
@@ -185,7 +198,7 @@
             </thead>
             <tbody>
               {% for enquiry in enquiries %}
-              <tr>
+              <tr class="{% if enquiry.status == 'Waiting for counseling' %}row-waiting{% elif enquiry.status == 'Counciling done.' %}row-counseling-done{% elif enquiry.status == 'booking done.' %}row-booking-done{% elif enquiry.status == 'need to follow up.' %}row-follow-up{% endif %}">
                 <td>
                   <a href="{{ url_for('edit_enquiry', enquiry_id=enquiry.id) }}"
                     >{{ enquiry.token_number | default('', true) }}</a
