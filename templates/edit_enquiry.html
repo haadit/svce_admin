@@ -453,13 +453,13 @@
       </div>
       <div class="details-section" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; margin-top: 8px;">
         <div style="font-size: 0.9rem; font-weight: 500; color: #222;">Token No.: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.token_number | default('', true) }}</span></div>
-        <div style="font-size: 0.9rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">Status: 
+        <!-- <div style="font-size: 0.9rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">Status: 
             <span
                 class="{% if enquiry.status == 'Waiting for counseling' %}status-waiting{% elif enquiry.status == 'Counciling done.' %}status-counseling-done{% elif enquiry.status == 'booking done.' %}status-booking-done{% elif enquiry.status == 'need to follow up.' %}status-follow-up{% endif %}"
             >
                 {{ enquiry.status | default('N/A', true) }}
             </span>
-        </div>
+        </div> -->
         <div style="font-size: 0.8rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
           <label for="enquiry_date" style="margin: 0; font-weight: 500;">Date:</label>
           <input
