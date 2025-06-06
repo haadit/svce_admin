@@ -42,6 +42,8 @@ def login():
         password = request.form.get('password')
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['logged_in'] = True
+            # Set a placeholder user in session for the dashboard check
+            session['user'] = {'id': username} # Use username as a simple ID
             return redirect(url_for('dashboard'))
         else:
             error = "Invalid credentials. Please try again."
@@ -56,33 +58,39 @@ def logout():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @require_admin
 def dashboard():
-    error_message = None
-    if request.method == 'POST' and request.form.get('status_update'):
-        # Handle status updates
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user']['id']
+    # Check if connected is in session and is False
+    connected = session.get('connected', True)
+    error = None
+    enquiries = []
+
+    if connected:
         try:
-            updates = []
-            for key in request.form:
-                if key.startswith('enquiry_id_'):
-                    idx = key.split('_')[-1]
-                    enquiry_id = request.form[key]
-                    status_key = f'status_{idx}'
-                    status_val = request.form.get(status_key)
-                    if enquiry_id and status_val:
-                        updates.append((enquiry_id, status_val))
-            for enquiry_id, status_val in updates:
-                supabase.table('admission_enquiries').update({'status': status_val}).eq('id', enquiry_id).execute()
+            # Get filter status from request arguments
+            status_filter = request.args.get('status')
+
+            # Base query
+            query = supabase.table('admission_enquiries').select('*')
+
+            # Apply filter if status is provided and not 'All'
+            if status_filter and status_filter != 'All':
+                query = query.eq('status', status_filter)
+
+            data = query.execute()
+            enquiries = data.data
+
         except Exception as e:
-            error_message = f"Error updating status: {e}"
-    try:
-        data = supabase.from_('admission_enquiries').select('*').order('token_number').execute()
-        enquiries = data.data if data and data.data else []
-        connected = True
-    except Exception as e:
-        connected = False
-        enquiries = []
-        error_message = f"Error connecting to Supabase or fetching data: {e}"
-        return render_template('dashboard.html', connected=connected, error=error_message)
-    return render_template('dashboard.html', connected=connected, enquiries=enquiries, error=error_message)
+            # Handle potential exceptions during Supabase interaction
+            error = f"Database error: {e}"
+            enquiries = []
+            connected = False # Indicate disconnection due to error
+
+    # Pass connected status, error, and enquiries to the template
+    # Also pass the selected status filter to the template
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries)
 
 @app.route('/student_details/<enquiry_id>')
 @require_admin
@@ -130,6 +138,10 @@ def edit_enquiry(enquiry_id):
         "AP/Telangana",
         "Others"
     ]
+    education_qualification_options = [
+        "12th",
+        "Diploma"
+    ]
     try:
         if request.method == 'POST':
             form_data = request.form
@@ -145,6 +157,7 @@ def edit_enquiry(enquiry_id):
                 'mother_mobile': form_data.get('mother_mobile'),
                 'address': form_data.get('address'),
                 'reference': form_data.get('reference'),
+                'educational_qualification': form_data.get('education_qualification'),
                 'physics_marks': form_data.get('physics_marks') or None,
                 'chemistry_marks': form_data.get('chemistry_marks') or None,
                 'mathematics_marks': form_data.get('mathematics_marks') or None,
@@ -168,6 +181,8 @@ def edit_enquiry(enquiry_id):
                 'jee_rank': form_data.get('jee_rank') or None,
                 'comedk_rank': form_data.get('comedk_rank') or None,
                 'cet_rank': form_data.get('cet_rank') or None,
+                'diploma_percentage': form_data.get('diploma_percentage') or None,
+                'dcet_rank': form_data.get('dcet_rank') or None,
                 'updated_at': datetime.now().isoformat()
             }
             # Set enquiry_date to current date if not provided, otherwise use form value
@@ -232,7 +247,7 @@ def edit_enquiry(enquiry_id):
         current_preferences = {}
         error_message = f"An unexpected error occurred: {e}"
         print(f"Unexpected error in edit_enquiry: {e}")
-    return render_template('edit_enquiry.html', connected=connected, enquiry=enquiry, course_preferences=course_preferences_list, all_courses=all_courses, current_preferences=current_preferences, error=error_message, education_board_options=education_board_options)
+    return render_template('edit_enquiry.html', connected=connected, enquiry=enquiry, course_preferences=course_preferences_list, all_courses=all_courses, current_preferences=current_preferences, error=error_message, education_board_options=education_board_options, education_qualification_options=education_qualification_options)
 
 
 if __name__ == '__main__':

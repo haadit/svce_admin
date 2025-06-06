@@ -163,6 +163,31 @@
           min-width: 600px;
         }
       }
+      #status-filter-form {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #status-filter-form label {
+        font-weight: 500;
+        color: #3b4a5a;
+        font-size: 1.08em;
+        margin-bottom: 0;
+      }
+      #status-filter-form select {
+        padding: 8px 12px;
+        border: 1.5px solid #c7d2fe;
+        border-radius: 6px;
+        font-size: 1em;
+        background: #f8fafc;
+        cursor: pointer;
+      }
+      #status-filter-form select:focus {
+        border-color: #007bff;
+        outline: none;
+        background: #fff;
+      }
     </style>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
@@ -181,6 +206,16 @@
 
       {% if connected %}
       <h3>Admission Enquiries:</h3>
+      <form method="GET" action="{{ url_for('dashboard') }}" id="status-filter-form">
+        <label for="status-filter">Filter by Status:</label>
+        <select name="status" id="status-filter" onchange="this.form.submit()">
+          <option value="All" {% if not status_filter or status_filter == 'All' %}selected{% endif %}>All</option>
+          <option value="Waiting for counseling" {% if status_filter == 'Waiting for counseling' %}selected{% endif %}>Waiting for counseling</option>
+          <option value="Counciling done." {% if status_filter == 'Counciling done.' %}selected{% endif %}>Counciling done.</option>
+          <option value="booking done." {% if status_filter == 'booking done.' %}selected{% endif %}>booking done.</option>
+          <option value="need to follow up." {% if status_filter == 'need to follow up.' %}selected{% endif %}>need to follow up.</option>
+        </select>
+      </form>
       {% if enquiries %}
       <form method="POST" action="{{ url_for('dashboard') }}" id="status-form">
         <input type="hidden" name="status_update" value="1" />
