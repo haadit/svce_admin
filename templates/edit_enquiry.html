@@ -591,7 +591,7 @@
 
         <div id="section12thStandard">
           <div class="section-title">12th Standard: (Physics, Chemistry, and Mathematics are mandatory)</div>
-          <div class="row three-cols">
+          <div class="row three-cols" id="row12thPCM">
             <div class="form-group">
               <label for="physics_marks">Physics:</label>
               <input type="number" id="physics_marks" name="physics_marks" value="{{ enquiry.physics_marks | default('', true) }}" step="any">
@@ -607,7 +607,7 @@
           </div>
           <div class="row">
             <div class="form-group">
-              <label for="education_board">Education Board (11th):</label>
+              <label for="education_board">Education Board (12th):</label>
               <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
                 <option value="">Select Board</option>
                 {% set current_board = enquiry.education_board|default('', true) %}
@@ -628,26 +628,26 @@
                 <input type="number" id="physics_marks_11" name="physics_marks_11" value="{{ enquiry.physics_marks_11 | default('', true) }}" step="any">
               </div>
               <div class="form-group">
-                <label for="physics_marks_11_practical">Physics (Practical) (11th):</label>
-                <input type="number" id="physics_marks_11_practical" name="physics_marks_11_practical" value="{{ enquiry.physics_marks_11_practical | default('', true) }}" step="any">
-              </div>
-              <div class="form-group">
                 <label for="chemistry_marks_11">Chemistry (Theory) (11th):</label>
                 <input type="number" id="chemistry_marks_11" name="chemistry_marks_11" value="{{ enquiry.chemistry_marks_11 | default('', true) }}" step="any">
-              </div>
-            </div>
-            <div class="row three-cols">
-              <div class="form-group">
-                <label for="chemistry_marks_11_practical">Chemistry (Practical) (11th):</label>
-                <input type="number" id="chemistry_marks_11_practical" name="chemistry_marks_11_practical" value="{{ enquiry.chemistry_marks_11_practical | default('', true) }}" step="any">
               </div>
               <div class="form-group">
                 <label for="mathematics_marks_11a">Mathematics (A) (11th):</label>
                 <input type="number" id="mathematics_marks_11a" name="mathematics_marks_11a" value="{{ enquiry.mathematics_marks_11a | default('', true) }}" step="any">
               </div>
+            </div>
+            <div class="row three-cols">
               <div class="form-group">
                 <label for="mathematics_marks_11b">Mathematics (B) (11th):</label>
                 <input type="number" id="mathematics_marks_11b" name="mathematics_marks_11b" value="{{ enquiry.mathematics_marks_11b | default('', true) }}" step="any">
+              </div>
+              <div class="form-group">
+                <label for="english_marks_11">English (11th):</label>
+                <input type="number" id="english_marks_11" name="english_marks_11" value="{{ enquiry.english_marks_11 | default('', true) }}" step="any">
+              </div>
+              <div class="form-group">
+                <label for="language_marks_11">Language (11th):</label>
+                <input type="number" id="language_marks_11" name="language_marks_11" value="{{ enquiry.language_marks_11 | default('', true) }}" step="any">
               </div>
             </div>
              <div class="section-title">12th Standard Details <span style="color: red; font-size: 0.8em;">(For AP/Telangana students only)</span></div>
@@ -756,7 +756,7 @@
           <div class="section-title">Kannada, English, Other Subjects (Optional)</div>
           <div class="row three-cols">
               <div class="form-group">
-                  <label for="kannada_marks_12">Kannada: (Optional)</label>
+                  <label for="kannada_marks_12">Kannada/Telugu/Sanskrit: (Optional)</label>
                   <input
                       type="number"
                       id="kannada_marks_12"
@@ -1122,6 +1122,51 @@
                    }
                }
            });
+       }
+
+       function updateOptionalSubjectsSection() {
+         var board = document.getElementById('education_board').value;
+         var optionalSubjectsSection = document.getElementById('optionalSubjectsSection');
+         if (board === 'AP/Telangana') {
+           optionalSubjectsSection.style.display = 'none';
+         } else {
+           optionalSubjectsSection.style.display = '';
+         }
+       }
+
+       // Update on board change
+       if (educationBoardSelect) {
+         educationBoardSelect.addEventListener('change', updateOptionalSubjectsSection);
+       }
+       // Initial call
+       updateOptionalSubjectsSection();
+
+       function update12thPCMRowVisibility() {
+         var board = document.getElementById('education_board').value;
+         var row12thPCM = document.getElementById('row12thPCM');
+         if (row12thPCM) {
+           if (board === 'AP/Telangana') {
+             row12thPCM.style.display = 'none';
+           } else {
+             row12thPCM.style.display = '';
+           }
+         }
+       }
+       if (educationBoardSelect) {
+         educationBoardSelect.addEventListener('change', update12thPCMRowVisibility);
+       }
+       document.addEventListener('DOMContentLoaded', update12thPCMRowVisibility);
+
+       function updateEleventhStandardVisibility() {
+         var board = document.getElementById('education_board').value;
+         var section11th = document.getElementById('section11th');
+         if (section11th) {
+           if (board === 'AP/Telangana') {
+             section11th.style.display = 'block';
+           } else {
+             section11th.style.display = 'none';
+           }
+         }
        }
      </script>
    </body>
