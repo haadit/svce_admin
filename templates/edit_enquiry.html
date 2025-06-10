@@ -246,6 +246,36 @@
           border-radius: 6px; 
           font-weight: 600;
       }
+      .print-only {
+          display: none;
+      }
+      .print-only-inline {
+          display: none; /* Hidden by default on screen */
+      }
+      .print-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 0 !important;
+          margin-bottom: 0 !important; /* Ensure no margin between tables */
+          border: 1px solid #666;
+      }
+      .print-table th, .print-table td {
+          border: 1px solid #666;
+          padding: 2px 4px;
+          text-align: left;
+          line-height: 1.2;
+      }
+      .print-table th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+      }
+      .section-title-print {
+          background-color: #e0e7ff;
+          color: #007bff;
+          font-size: 1.1em;
+          padding: 8px;
+          font-weight: 600;
+      }
       /* General print adjustments */
       @media print {
           @page {
@@ -257,8 +287,15 @@
           .back-link,
           .mandatory-note,
           .info-box,
-          .print-hidden {
+          .print-hidden,
+          form { /* Hide the entire form during print */
               display: none !important;
+          }
+          .print-only {
+              display: block !important;
+          }
+          .print-only-inline {
+              display: block !important; /* Show only for print */
           }
           /* Show created_at timestamp */
           .created-at-print {
@@ -275,8 +312,8 @@
           }
           /* Ensure logo fills width and other print styles are correct */
           img[alt="College Logo"] {
-              max-width: 220px !important; /* Further reduce the max width for print */
-              width: 220px !important; /* Further reduce the width for print */
+              max-width: 250px !important; /* Further reduce the max width for print */
+              width: 250px !important; /* Further reduce the width for print */
               margin-bottom: 4px !important; /* Add space below logo */
               padding: 0 !important; /* Remove padding around logo */
               box-shadow: none !important; /* Remove shadow for print */
@@ -285,7 +322,7 @@
           }
           body {
             background: #fff !important;
-            font-size: 10.0px !important; /* Adjusted base font size for readability */
+            font-size: 12.5px !important; /* Increased base font size for readability */
             margin: 0 !important;
             padding: 0 !important;
           }
@@ -453,14 +490,8 @@
       </div>
       <div class="details-section" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; margin-top: 8px;">
         <div style="font-size: 0.9rem; font-weight: 500; color: #222;">Token No.: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.token_number | default('', true) }}</span></div>
-        <!-- <div style="font-size: 0.9rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">Status: 
-            <span
-                class="{% if enquiry.status == 'Waiting for counseling' %}status-waiting{% elif enquiry.status == 'Counciling done.' %}status-counseling-done{% elif enquiry.status == 'booking done.' %}status-booking-done{% elif enquiry.status == 'need to follow up.' %}status-follow-up{% endif %}"
-            >
-                {{ enquiry.status | default('N/A', true) }}
-            </span>
-        </div> -->
-        <div style="font-size: 0.8rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
+        <div class="print-only-inline" style="font-size: 0.9rem; font-weight: 500; color: #222;">Created At: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.created_at | default('N/A', true) }}</span></div>
+        <div class="print-hidden" style="font-size: 0.8rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
           <label for="enquiry_date" style="margin: 0; font-weight: 500;">Date:</label>
           <input
             type="date"
@@ -482,9 +513,234 @@
       <p class="error-message">Error: {{ error }}</p>
       {% endif %}
 
-      <div class="created-at-print">
-          Created At: <span>{{ enquiry.created_at | default('N/A', true) }}</span>
-      </div>
+      <div class="print-only">
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Personal Details</th>
+              <th colspan="2" class="section-title-print">Contact Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Full Name:</td><td>{{ enquiry.student_name | default('N/A', true) }}</td>
+              <td>Student Email:</td><td>{{ enquiry.student_email | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td>Father's Name:</td><td>{{ enquiry.father_name | default('N/A', true) }}</td>
+              <td>Student Mobile:</td><td>{{ enquiry.student_mobile | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td>Mother's Name:</td><td>{{ enquiry.mother_name | default('N/A', true) }}</td>
+              <td>Education Qualification:</td><td>{{ enquiry.educational_qualification | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td>Address:</td><td>{{ enquiry.address | default('N/A', true) }}</td>
+              <td>Father's Mobile:</td><td>{{ enquiry.father_mobile | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td>Mother's Mobile:</td><td>{{ enquiry.mother_mobile | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td>Reference:</td><td>{{ enquiry.reference | default('N/A', true) }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 11th Standard Details (For AP/Telangana students only) -->
+        {% if enquiry.educational_qualification == '12th' %}
+          {% if enquiry.education_board == 'AP/Telangana' %}
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="6" class="section-title-print">11th Standard Details (For AP/Telangana students only)</th>
+              </tr>
+              <tr>
+                <th>Physics (Theory)</th>
+                <th>Chemistry (Theory)</th>
+                <th>Mathematics (A)</th>
+                <th>Mathematics (B)</th>
+                <th>English</th>
+                <th>Language</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.physics_marks_11 | default('N/A', true) }}</td>
+                <td>{{ enquiry.chemistry_marks_11 | default('N/A', true) }}</td>
+                <td>{{ enquiry.mathematics_marks_11a | default('N/A', true) }}</td>
+                <td>{{ enquiry.mathematics_marks_11b | default('N/A', true) }}</td>
+                <td>{{ enquiry.english_marks_11 | default('N/A', true) }}</td>
+                <td>{{ enquiry.language_marks_11 | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="6" class="section-title-print">12th Standard Details (For AP/Telangana students only)</th>
+              </tr>
+              <tr>
+                <th>Physics (Theory)</th>
+                <th>Physics (Practical)</th>
+                <th>Chemistry (Theory)</th>
+                <th>Chemistry (Practical)</th>
+                <th>Mathematics (A)</th>
+                <th>Mathematics (B)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.physics_marks | default('N/A', true) }}</td>
+                <td>{{ enquiry.physics_marks_12_practical | default('N/A', true) }}</td>
+                <td>{{ enquiry.chemistry_marks | default('N/A', true) }}</td>
+                <td>{{ enquiry.chemistry_marks_12_practical | default('N/A', true) }}</td>
+                <td>{{ enquiry.mathematics_marks_12a | default('N/A', true) }}</td>
+                <td>{{ enquiry.mathematics_marks_12b | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          {% else %}
+          <!-- 12th Standard Details (General) -->
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="3" class="section-title-print">12th Standard Details (Physics, Chemistry, and Mathematics are mandatory)</th>
+              </tr>
+              <tr>
+                <th>Physics</th>
+                <th>Chemistry</th>
+                <th>Mathematics</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.physics_marks | default('N/A', true) }}</td>
+                <td>{{ enquiry.chemistry_marks | default('N/A', true) }}</td>
+                <td>{{ enquiry.mathematics_marks | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- CS, BIO, ECE (Optional) -->
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="3" class="section-title-print">CS, BIO, ECE (Optional)</th>
+              </tr>
+              <tr>
+                <th>CS</th>
+                <th>BIO</th>
+                <th>ECE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.cs_marks | default('N/A', true) }}</td>
+                <td>{{ enquiry.bio_marks | default('N/A', true) }}</td>
+                <td>{{ enquiry.ece_marks | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          {% endif %}
+
+          <!-- Other Subjects -->
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="3" class="section-title-print">Kannada, English, Other Subjects (Optional)</th>
+              </tr>
+              <tr>
+                <th>Kannada/Telugu/Sanskrit</th>
+                <th>English</th>
+                <th>Other Subject Marks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.kannada_marks_12 | default('N/A', true) }}</td>
+                <td>{{ enquiry.english_marks_12 | default('N/A', true) }}</td>
+                <td>{{ enquiry.other_unnamed_marks_12 | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Percentage Details -->
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="2" class="section-title-print">Percentage Details</th>
+              </tr>
+              <tr>
+                <th>Total Percentage</th>
+                <th>PCM Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.total_percentage | default('N/A', true) }}</td>
+                <td>{{ enquiry.pcm_percentage | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Entrance Exam Detail -->
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="3" class="section-title-print">Entrance Exam Detail</th>
+              </tr>
+              <tr>
+                <th>JEE Rank</th>
+                <th>COMEDK Rank</th>
+                <th>CET Rank</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.jee_rank | default('N/A', true) }}</td>
+                <td>{{ enquiry.comedk_rank | default('N/A', true) }}</td>
+                <td>{{ enquiry.cet_rank | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% elif enquiry.educational_qualification == 'Diploma' %}
+          <!-- Diploma Details -->
+          <table class="print-table" style="margin-top: 0px;">
+            <thead>
+              <tr>
+                <th colspan="2" class="section-title-print">Diploma Details</th>
+              </tr>
+              <tr>
+                <th>Diploma Percentage</th>
+                <th>DCET Rank</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ enquiry.diploma_percentage | default('N/A', true) }}</td>
+                <td>{{ enquiry.dcet_rank | default('N/A', true) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}
+
+        <!-- Course Preference Order -->
+        <table class="print-table" style="margin-top: 0px;">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Course Preference Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for course_name, preference_data in current_preferences.items() %}
+            <tr><td>{{ preference_data.preference_order }}.</td><td>{{ course_name }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div> <!-- End print-only section -->
 
       <form method="POST">
         <div class="row">
