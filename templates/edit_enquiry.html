@@ -45,7 +45,7 @@
       textarea {
         width: 100%;
         padding: 12px;
-        border: 1.5px solid #c7d2fe;
+        border: 2px solid #c7d2fe;
         border-radius: 6px;
         box-sizing: border-box;
         font-size: 1.05em;
@@ -57,14 +57,14 @@
       input[type="number"]:focus,
       input[type="date"]:focus,
       textarea:focus {
-        border: 1.5px solid #007bff;
+        border: 1.8px solid #007bff;
         outline: none;
         background: #fff;
       }
       .styled-select {
         width: 100%;
         padding: 12px;
-        border: 1.5px solid #c7d2fe;
+        border: 2px solid #c7d2fe;
         border-radius: 6px;
         box-sizing: border-box;
         font-size: 1.05em;
@@ -81,7 +81,7 @@
         height: auto;
       }
       .styled-select:focus {
-        border: 1.5px solid #007bff;
+        border: 2px solid #007bff;
         outline: none;
         background: #fff;
       }
@@ -588,7 +588,21 @@
             />
           </div>
         </div>
-
+        <div class="row">
+          <div class="form-group">
+            <label for="education_board">Education Board (12th):</label>
+            <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
+              <option value="">Select Board</option>
+              {% set current_board = enquiry.education_board|default('', true) %}
+              {% if current_board and current_board not in education_board_options %}
+                <option value="{{ current_board }}" selected>{{ current_board }}</option>
+              {% endif %}
+              {% for board in education_board_options %}
+                <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
         <div id="section12thStandard">
           <div class="section-title">12th Standard: (Physics, Chemistry, and Mathematics are mandatory)</div>
           <div class="row three-cols" id="row12thPCM">
@@ -605,21 +619,7 @@
               <input type="number" id="mathematics_marks" name="mathematics_marks" value="{{ enquiry.mathematics_marks | default('', true) }}" step="any">
             </div>
           </div>
-          <div class="row">
-            <div class="form-group">
-              <label for="education_board">Education Board (12th):</label>
-              <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
-                <option value="">Select Board</option>
-                {% set current_board = enquiry.education_board|default('', true) %}
-                {% if current_board and current_board not in education_board_options %}
-                  <option value="{{ current_board }}" selected>{{ current_board }}</option>
-                {% endif %}
-                {% for board in education_board_options %}
-                  <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
+          
           <div id="section11th">
             <div class="section-title">11th Standard Details <span style="color: red; font-size: 0.8em;">(For AP/Telangana students only)</span></div>
             <div class="row three-cols">
