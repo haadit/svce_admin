@@ -67,6 +67,36 @@ def dashboard():
     error = None
     enquiries = []
 
+    if request.method == 'POST':
+        if request.form.get('status_update'):
+            # Process status updates
+            try:
+                for key, value in request.form.items():
+                    if key.startswith('status_'):
+                        index = key.replace('status_', '')
+                        enquiry_id = request.form.get(f'enquiry_id_{index}')
+                        new_status = value
+                        new_remarks = request.form.get(f'remarks_{index}')
+
+                        if enquiry_id and new_status:
+                            update_data = {
+                                'status': new_status,
+                                'updated_at': datetime.now().isoformat()
+                            }
+                            # Add remarks to update data if it's available
+                            if new_remarks is not None:
+                                update_data['remarks'] = new_remarks
+
+                            update_response = supabase.table('admission_enquiries').update(update_data).eq('id', enquiry_id).execute()
+                            if hasattr(update_response, 'error') and update_response.error:
+                                error = f"Error updating status for ID {enquiry_id}: {update_response.error}"
+                                print(error) # Log the error for debugging
+                # Redirect to dashboard (GET request) after updates to show fresh data
+                return redirect(url_for('dashboard'))
+            except Exception as e:
+                error = f"An unexpected error occurred during status update: {e}"
+                print(error) # Log the error for debugging
+
     if connected:
         try:
             # Get filter status from request arguments
@@ -90,7 +120,7 @@ def dashboard():
 
     # Pass connected status, error, and enquiries to the template
     # Also pass the selected status filter to the template
-    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries)
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter)
 
 @app.route('/student_details/<enquiry_id>')
 @require_admin

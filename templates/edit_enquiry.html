@@ -730,12 +730,69 @@
         <table class="print-table" style="margin-top: 0px;">
           <thead>
             <tr>
-              <th colspan="2" class="section-title-print">Course Preference Order</th>
+              <th colspan="5" class="section-title-print" style="text-align: center;">Course Preference Order</th> {# Centered title for the table #}
+            </tr>
+            <tr>
+              <th>Preference</th>
+              <th style="width: 40%;">Course</th> {# Give more width to Course #}
+              <th style="width: 20%;">Annual Fees</th> {# Equal width for these 3 #}
+              <th style="width: 20%;"></th> {# Empty column 1 #}
+              <th style="width: 20%;"></th> {# Empty column 2 #}
             </tr>
           </thead>
           <tbody>
+            {% set annual_fees = {
+                'BE Computer Science and Engineering': '3,75,000',
+                'BE Computer Science and Engineering (Artificial Intelligence)': '3,75,000',
+                'BE Computer Science and Engineering (Data Science)': '3,50,000',
+                'BE Computer Science and Engineering (Cyber Security)': '3,25,000',
+                'BE Information Science and Engineering': '3,25,000',
+                'BE Electronics and Communication Engineering': '2,75,000',
+                'BE Civil Engineering': '1,25,000',
+                'BE Mechanical Engineering': '1,25,000'
+            } %}
+            {# Define the order of courses as per user's image #}
+            {% set ordered_courses = [
+                'BE Computer Science and Engineering',
+                'BE Computer Science and Engineering (Artificial Intelligence)',
+                'BE Computer Science and Engineering (Data Science)',
+                'BE Computer Science and Engineering (Cyber Security)',
+                'BE Information Science and Engineering',
+                'BE Electronics and Communication Engineering',
+                'BE Civil Engineering',
+                'BE Mechanical Engineering'
+            ] %}
+            {# Extract selected courses and sort them by preference order #}
+            {% set selected_courses_list = [] %}
             {% for course_name, preference_data in current_preferences.items() %}
-            <tr><td>{{ preference_data.preference_order }}.</td><td>{{ course_name }}</td></tr>
+                {% if course_name in ordered_courses %}
+                    {% set _ = selected_courses_list.append({'name': course_name, 'order': preference_data.preference_order}) %}
+                {% endif %}
+            {% endfor %}
+            {% set sorted_selected_courses = selected_courses_list | sort(attribute='order') %}
+
+            {# Display selected courses first, sorted by preference #}
+            {% for item in sorted_selected_courses %}
+            <tr>
+                <td>{{ item.order }}.</td>
+                <td style="width: 40%;">{{ item.name }}</td> {# Give more width to Course #}
+                <td style="width: 20%;">{{ annual_fees.get(item.name, 'N/A') }}</td> {# Equal width for these 3 #}
+                <td style="width: 20%;"></td> {# Empty column 1 content #}
+                <td style="width: 20%;"></td> {# Empty column 2 content #}
+            </tr>
+            {% endfor %}
+
+            {# Display remaining courses that are not selected, in the predefined order #}
+            {% for course in ordered_courses %}
+                {% if course not in current_preferences %}
+                <tr>
+                    <td>-</td>
+                    <td style="width: 40%;">{{ course }}</td> {# Give more width to Course #}
+                    <td style="width: 20%;">{{ annual_fees.get(course, 'N/A') }}</td> {# Equal width for these 3 #}
+                    <td style="width: 20%;"></td> {# Empty column 1 content #}
+                    <td style="width: 20%;"></td> {# Empty column 2 content #}
+                </tr>
+                {% endif %}
             {% endfor %}
           </tbody>
         </table>
@@ -842,23 +899,23 @@
               name="reference"
               value="{{ enquiry.reference | default('', true) }}"
             />
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="form-group">
-            <label for="education_board">Education Board (12th):</label>
-            <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
-              <option value="">Select Board</option>
-              {% set current_board = enquiry.education_board|default('', true) %}
-              {% if current_board and current_board not in education_board_options %}
-                <option value="{{ current_board }}" selected>{{ current_board }}</option>
-              {% endif %}
-              {% for board in education_board_options %}
-                <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
-              {% endfor %}
-            </select>
+          <div class="row">
+            <div class="form-group">
+              <label for="education_board">Education Board (12th):</label>
+              <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
+                <option value="">Select Board</option>
+                {% set current_board = enquiry.education_board|default('', true) %}
+                {% if current_board and current_board not in education_board_options %}
+                  <option value="{{ current_board }}" selected>{{ current_board }}</option>
+                {% endif %}
+                {% for board in education_board_options %}
+                  <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
+                {% endfor %}
+              </select>
+            </div>
           </div>
-        </div>
         <div id="section12thStandard">
           <div class="section-title">12th Standard: (Physics, Chemistry, and Mathematics are mandatory)</div>
           <div class="row three-cols" id="row12thPCM">

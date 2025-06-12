@@ -77,10 +77,11 @@
       }
       th,
       td {
-        padding: 16px 14px;
+        padding: 12px 14px;
         text-align: left;
         word-break: normal;
         white-space: nowrap;
+        vertical-align: middle;
       }
       th {
         background: #e0e7ff;
@@ -91,7 +92,6 @@
         position: sticky;
         top: 0;
         z-index: 1;
-        vertical-align: top;
       }
       tr {
         transition: background 0.18s;
@@ -121,7 +121,7 @@
       td {
         color: #2d3a4a;
         font-size: 1.04em;
-        vertical-align: top;
+        vertical-align: middle;
         border-bottom: 1px solid #e0e7ff;
       }
       .error-message {
@@ -177,13 +177,43 @@
       }
       #status-filter-form select {
         padding: 8px 12px;
-        border: 1.5px solid #c7d2fe;
+        border: 1.5px solid #3b4a5a;
         border-radius: 6px;
         font-size: 1em;
         background: #f8fafc;
         cursor: pointer;
       }
       #status-filter-form select:focus {
+        border-color: #007bff;
+        outline: none;
+        background: #fff;
+      }
+      .remarks-input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1.5px solid #3b4a5a;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 0.95em;
+        background: #f8fafc;
+        transition: border 0.2s;
+      }
+      .remarks-input:focus {
+        border-color: #007bff;
+        outline: none;
+        background: #fff;
+      }
+      /* Status dropdowns in table */
+      .status-dropdown {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1.5px solid #3b4a5a;
+        background: #f8fafc;
+        font-size: 1em;
+        font-weight: 600;
+        transition: border 0.2s;
+      }
+      .status-dropdown:focus {
         border-color: #007bff;
         outline: none;
         background: #fff;
@@ -225,10 +255,8 @@
               <tr>
                 <th>Token No</th>
                 <th>Student Name</th>
-                <th>Student Mobile</th>
-                <th>Student Email</th>
-                <th>Total Percentage</th>
                 <th>Status</th>
+                <th>Remarks</th>
               </tr>
             </thead>
             <tbody>
@@ -241,9 +269,6 @@
                   <input type="hidden" name="enquiry_id_{{ loop.index }}" value="{{ enquiry.id }}" />
                 </td>
                 <td>{{ enquiry.student_name | default('', true) }}</td>
-                <td>{{ enquiry.student_mobile | default('', true) }}</td>
-                <td>{{ enquiry.student_email | default('', true) }}</td>
-                <td>{{ enquiry.total_percentage | default('N/A', true) }}</td>
                 <td>
                   <select name="status_{{ loop.index }}" data-enquiry-id="{{ enquiry.id }}" class="status-dropdown" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #c7d2fe; background: #f8fafc; font-size: 1em; font-weight: 600;">
                     <option value="Waiting for counseling" {% if enquiry.status == 'Waiting for counseling' %}selected{% endif %} style="color: #2563eb; background: #e0e7ff;">Waiting for counseling</option>
@@ -251,6 +276,9 @@
                     <option value="booking done." {% if enquiry.status == 'booking done.' %}selected{% endif %} style="color: #ea580c; background: #ffedd5;">booking done.</option>
                     <option value="need to follow up." {% if enquiry.status == 'need to follow up.' %}selected{% endif %} style="color: #dc2626; background: #fee2e2;">need to follow up.</option>
                   </select>
+                </td>
+                <td>
+                  <input type="text" name="remarks_{{ loop.index }}" value="{{ enquiry.remarks | default('', true) }}" class="remarks-input" style="width: 100%; padding: 6px 12px; border-radius: 6px; border: 1.5px solid #c7d2fe; background: #f8fafc; font-size: 1em;" />
                 </td>
               </tr>
               {% endfor %}
@@ -266,6 +294,14 @@
         let changed = false;
         dropdowns.forEach(function(drop) {
           drop.addEventListener('change', function() {
+            changed = true;
+            saveBtn.style.opacity = 1;
+            saveBtn.style.pointerEvents = 'auto';
+          });
+        });
+        const remarksInputs = document.querySelectorAll('.remarks-input');
+        remarksInputs.forEach(function(input) {
+          input.addEventListener('input', function() {
             changed = true;
             saveBtn.style.opacity = 1;
             saveBtn.style.pointerEvents = 'auto';
