@@ -109,6 +109,9 @@ def dashboard():
             if status_filter and status_filter != 'All':
                 query = query.eq('status', status_filter)
 
+            # Order by token_number in ascending order
+            query = query.order('token_number', desc=False)
+
             data = query.execute()
             enquiries = data.data
 
