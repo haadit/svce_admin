@@ -77,6 +77,7 @@ def dashboard():
                         enquiry_id = request.form.get(f'enquiry_id_{index}')
                         new_status = value
                         new_remarks = request.form.get(f'remarks_{index}')
+                        new_follow_up_date = request.form.get(f'follow_up_date_{index}')
 
                         if enquiry_id and new_status:
                             update_data = {
@@ -86,6 +87,11 @@ def dashboard():
                             # Add remarks to update data if it's available
                             if new_remarks is not None:
                                 update_data['remarks'] = new_remarks
+                            # Add follow_up_date to update data if it's available
+                            if new_follow_up_date:
+                                update_data['follow_up_date'] = new_follow_up_date
+                            else:
+                                update_data['follow_up_date'] = None # Ensure it's set to null if empty
 
                             update_response = supabase.table('admission_enquiries').update(update_data).eq('id', enquiry_id).execute()
                             if hasattr(update_response, 'error') and update_response.error:
@@ -101,6 +107,7 @@ def dashboard():
         try:
             # Get filter status from request arguments
             status_filter = request.args.get('status')
+            follow_up_date_filter = request.args.get('follow_up_date')
 
             # Base query
             query = supabase.table('admission_enquiries').select('*')
@@ -108,6 +115,10 @@ def dashboard():
             # Apply filter if status is provided and not 'All'
             if status_filter and status_filter != 'All':
                 query = query.eq('status', status_filter)
+
+            # Apply follow_up_date filter if provided
+            if follow_up_date_filter:
+                query = query.eq('follow_up_date', follow_up_date_filter)
 
             # Order by token_number in ascending order
             query = query.order('token_number', desc=False)
@@ -122,8 +133,8 @@ def dashboard():
             connected = False # Indicate disconnection due to error
 
     # Pass connected status, error, and enquiries to the template
-    # Also pass the selected status filter to the template
-    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter)
+    # Also pass the selected status filter and follow_up_date_filter to the template
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat())
 
 @app.route('/student_details/<enquiry_id>')
 @require_admin

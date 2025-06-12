@@ -10,6 +10,8 @@
         background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
         min-height: 100vh;
         color: #333;
+        display: flex;
+        flex-direction: column;
       }
       .dashboard-container {
         background: #fff;
@@ -19,13 +21,15 @@
         max-width: 1200px;
         margin: 40px auto;
         flex-grow: 1;
-        width: calc(100% - 60px);
+        width: calc(100% - 72px);
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
       }
       .header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         border-bottom: 2px solid #e0e7ff;
         padding-bottom: 18px;
         margin-bottom: 36px;
@@ -63,6 +67,9 @@
         overflow-x: auto;
         margin-top: 18px;
         padding-bottom: 10px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
       }
       table {
         width: 100%;
@@ -74,10 +81,11 @@
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        flex-grow: 1;
       }
       th,
       td {
-        padding: 12px 14px;
+        padding: 14px 16px;
         text-align: left;
         word-break: normal;
         white-space: nowrap;
@@ -87,14 +95,14 @@
         background: #e0e7ff;
         font-weight: bold;
         color: #2d3a4a;
-        font-size: 1.08em;
+        font-size: 1.1em;
         border-bottom: 2px solid #c7d2fe;
         position: sticky;
         top: 0;
         z-index: 1;
       }
       tr {
-        transition: background 0.18s;
+        transition: background 0.18s, box-shadow 0.18s;
       }
       tr:nth-child(even) td {
         background: #f1f5f9;
@@ -104,6 +112,14 @@
       }
       tr:hover td {
         background: #dbeafe;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 2;
+      }
+      /* Prevent .today-label-overlay from changing background on row hover */
+      tr:hover .today-label-overlay {
+        background-color: #e0e7ff !important; /* Keep original background on row hover */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important; /* Keep original shadow on row hover */
       }
       /* Status Row Colors */
       .row-waiting td {
@@ -120,7 +136,7 @@
       }
       td {
         color: #2d3a4a;
-        font-size: 1.04em;
+        font-size: 1.05em;
         vertical-align: middle;
         border-bottom: 1px solid #e0e7ff;
       }
@@ -146,55 +162,65 @@
         .dashboard-container {
           margin: 10px;
           padding: 12px;
-          width: calc(100% - 10px);
+          width: calc(100% - 20px);
         }
         th,
         td {
-          padding: 8px;
+          padding: 10px;
           white-space: normal;
         }
         h2 {
-          font-size: 1.4rem;
+          font-size: 1.6rem;
         }
         h3 {
-          font-size: 1.1rem;
+          font-size: 1.2rem;
         }
         table {
           min-width: 600px;
         }
       }
       #status-filter-form {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 20px;
+        flex-wrap: wrap;
       }
       #status-filter-form label {
         font-weight: 500;
         color: #3b4a5a;
-        font-size: 1.08em;
+        font-size: 1.1em;
         margin-bottom: 0;
       }
-      #status-filter-form select {
-        padding: 8px 12px;
+      #status-filter-form select,
+      #status-filter-form input[type="date"] {
+        padding: 11px 16px;
         border: 1.5px solid #3b4a5a;
-        border-radius: 6px;
-        font-size: 1em;
+        border-radius: 8px;
+        font-size: 1.05em;
         background: #f8fafc;
         cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s;
       }
-      #status-filter-form select:focus {
+      #status-filter-form select:focus,
+      #status-filter-form input[type="date"]:focus {
         border-color: #007bff;
         outline: none;
         background: #fff;
+        box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3);
+      }
+      /* Remove focus styles from input when Today overlay is active */
+      .follow-up-date-cell-container.today-active .follow-up-date-input:focus {
+        border-color: transparent !important;
+        box-shadow: none !important;
       }
       .remarks-input {
         width: 100%;
-        padding: 8px 10px;
+        padding: 9px 12px;
         border: 1.5px solid #3b4a5a;
-        border-radius: 6px;
+        border-radius: 7px;
         box-sizing: border-box;
-        font-size: 0.95em;
+        font-size: 1em;
         background: #f8fafc;
         transition: border 0.2s;
       }
@@ -205,11 +231,11 @@
       }
       /* Status dropdowns in table */
       .status-dropdown {
-        padding: 6px 12px;
-        border-radius: 6px;
+        padding: 7px 14px;
+        border-radius: 7px;
         border: 1.5px solid #3b4a5a;
         background: #f8fafc;
-        font-size: 1em;
+        font-size: 1.0em;
         font-weight: 600;
         transition: border 0.2s;
       }
@@ -217,6 +243,63 @@
         border-color: #007bff;
         outline: none;
         background: #fff;
+      }
+      .follow-up-date-input {
+        width: 100%;
+        padding: 7px 14px;
+        border-radius: 7px;
+        border: 1.5px solid #3b4a5a;
+        background: #f8fafc;
+        font-size: 1em;
+        transition: border 0.2s, opacity 0.2s;
+        box-sizing: border-box;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        opacity: 1;
+        pointer-events: auto;
+        cursor: pointer;
+        outline: none !important;
+      }
+      .follow-up-date-input:focus {
+        border-color: #007bff;
+        outline: none;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3);
+      }
+      .follow-up-date-cell-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+      }
+      .today-label {
+        font-weight: 700;
+        color: #007bff;
+        background: #e0e7ff;
+        padding: 5px 10px;
+        border-radius: 6px;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      .clear-date-filter-link {
+        color: #dc3545;
+        text-decoration: none;
+        font-size: 0.95em;
+        margin-left: 15px;
+        padding: 6px 12px;
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+      }
+      .clear-date-filter-link:hover {
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
     </style>
     <link
@@ -245,6 +328,14 @@
           <option value="booking done." {% if status_filter == 'booking done.' %}selected{% endif %}>booking done.</option>
           <option value="need to follow up." {% if status_filter == 'need to follow up.' %}selected{% endif %}>need to follow up.</option>
         </select>
+        <label for="follow-up-date-filter">Follow Up Date:</label>
+        <input type="date" name="follow_up_date" id="follow-up-date-filter" value="{{ follow_up_date_filter | default('', true) }}" onchange="this.form.submit()" style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;" />
+        <button type="button" id="today-filter-btn" class="today-filter-btn" style="background: #e0e7ff; color: #007bff; font-weight: 600; padding: 10px 18px; border-radius: 8px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: background 0.2s, transform 0.1s;" onmouseover="this.style.background='#c7d2fe';" onmouseout="this.style.background='#e0e7ff';" onclick="this.style.transform='scale(0.98)'; setTimeout(() => this.style.transform='scale(1)', 100);">
+          Today
+        </button>
+        {% if follow_up_date_filter %}
+          <a href="{{ url_for('dashboard', status=status_filter) }}" class="clear-date-filter-link">Clear Date Filter</a>
+        {% endif %}
       </form>
       {% if enquiries %}
       <form method="POST" action="{{ url_for('dashboard') }}" id="status-form">
@@ -257,6 +348,7 @@
                 <th>Student Name</th>
                 <th>Status</th>
                 <th>Remarks</th>
+                <th>Follow Up Date</th>
               </tr>
             </thead>
             <tbody>
@@ -280,6 +372,11 @@
                 <td>
                   <input type="text" name="remarks_{{ loop.index }}" value="{{ enquiry.remarks | default('', true) }}" class="remarks-input" style="width: 100%; padding: 6px 12px; border-radius: 6px; border: 1.5px solid #c7d2fe; background: #f8fafc; font-size: 1em;" />
                 </td>
+                <td>
+                  <div class="follow-up-date-cell-container">
+                    <input type="date" name="follow_up_date_{{ loop.index }}" value="{{ enquiry.follow_up_date | default('', true) }}" class="follow-up-date-input" />
+                  </div>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -292,26 +389,47 @@
         const saveBtn = document.getElementById('save-status-btn');
         const dropdowns = document.querySelectorAll('.status-dropdown');
         let changed = false;
+
+        function enableSaveButton() {
+          changed = true;
+          saveBtn.style.opacity = 1;
+          saveBtn.style.pointerEvents = 'auto';
+        }
+
         dropdowns.forEach(function(drop) {
-          drop.addEventListener('change', function() {
-            changed = true;
-            saveBtn.style.opacity = 1;
-            saveBtn.style.pointerEvents = 'auto';
-          });
+          drop.addEventListener('change', enableSaveButton);
         });
+
         const remarksInputs = document.querySelectorAll('.remarks-input');
         remarksInputs.forEach(function(input) {
-          input.addEventListener('input', function() {
-            changed = true;
-            saveBtn.style.opacity = 1;
-            saveBtn.style.pointerEvents = 'auto';
-          });
+          input.addEventListener('input', enableSaveButton);
         });
+
+        const followUpDateInputs = document.querySelectorAll('td .follow-up-date-input');
+        followUpDateInputs.forEach(function(input) {
+          // No overlay logic needed anymore, simply enable save button on change
+          input.addEventListener('change', enableSaveButton);
+        });
+
+        // Add event listener for the new "Today" button in the filter section
+        const todayFilterBtn = document.getElementById('today-filter-btn');
+        if (todayFilterBtn) {
+          todayFilterBtn.addEventListener('click', function() {
+            const today = new Date().toISOString().slice(0, 10);
+            const followUpDateFilter = document.getElementById('follow-up-date-filter');
+            if (followUpDateFilter) {
+              followUpDateFilter.value = today;
+              followUpDateFilter.form.submit();
+            }
+          });
+        }
+
         saveBtn.addEventListener('click', function() {
           if (changed) {
             form.submit();
           }
         });
+
         form.addEventListener('submit', function() {
           saveBtn.style.opacity = 0.6;
           saveBtn.style.pointerEvents = 'none';
