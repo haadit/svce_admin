@@ -94,6 +94,7 @@ def dashboard():
                                 update_data['follow_up_date'] = None # Ensure it's set to null if empty
 
                             update_response = supabase.table('admission_enquiries').update(update_data).eq('id', enquiry_id).execute()
+                            print(f"Update response for dashboard: {update_response}") # Added print for debugging
                             if hasattr(update_response, 'error') and update_response.error:
                                 error = f"Error updating status for ID {enquiry_id}: {update_response.error}"
                                 print(error) # Log the error for debugging
@@ -108,6 +109,7 @@ def dashboard():
             # Get filter status from request arguments
             status_filter = request.args.get('status')
             follow_up_date_filter = request.args.get('follow_up_date')
+            search_query = request.args.get('search_query')
 
             # Base query
             query = supabase.table('admission_enquiries').select('*')
@@ -119,6 +121,10 @@ def dashboard():
             # Apply follow_up_date filter if provided
             if follow_up_date_filter:
                 query = query.eq('follow_up_date', follow_up_date_filter)
+            
+            # Apply search filter if search_query is provided
+            if search_query:
+                query = query.ilike('student_name', f"%{search_query}%")
 
             # Order by token_number in ascending order
             query = query.order('token_number', desc=False)
@@ -134,7 +140,7 @@ def dashboard():
 
     # Pass connected status, error, and enquiries to the template
     # Also pass the selected status filter and follow_up_date_filter to the template
-    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat())
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query)
 
 @app.route('/student_details/<enquiry_id>')
 @require_admin
@@ -202,6 +208,7 @@ def edit_enquiry(enquiry_id):
                 'address': form_data.get('address'),
                 'reference': form_data.get('reference'),
                 'educational_qualification': form_data.get('education_qualification'),
+                'status': form_data.get('status'),
                 'physics_marks': form_data.get('physics_marks') or None,
                 'chemistry_marks': form_data.get('chemistry_marks') or None,
                 'mathematics_marks': form_data.get('mathematics_marks') or None,
@@ -252,6 +259,7 @@ def edit_enquiry(enquiry_id):
             course_preferences_json = {course: idx+1 for idx, (course, _) in enumerate(course_orders)}
             enquiry_update_data['course_preferences'] = course_preferences_json
             update_response = supabase.table('admission_enquiries').update(enquiry_update_data).eq('id', enquiry_id).execute()
+            print(f"Update response for edit_enquiry: {update_response}") # Added print for debugging
             if hasattr(update_response, 'error') and update_response.error:
                 error_message = f"Error updating admission enquiry: {update_response.error}"
             else:

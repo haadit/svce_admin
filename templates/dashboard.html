@@ -134,6 +134,15 @@
       .row-follow-up td {
         background-color: #fee2e2 !important; /* Light red */
       }
+      .status-follow-up td {
+        background-color: #fee2e2 !important; /* Light red */
+      }
+      .row-waiting-for-comedk td {
+        background-color: #fef9c3 !important; /* Light yellow for COMEDK */
+      }
+      .row-waiting-for-cet td {
+        background-color: #ffafcc !important; /* Light green for CET */
+      }
       td {
         color: #2d3a4a;
         font-size: 1.05em;
@@ -327,6 +336,8 @@
           <option value="Counciling done." {% if status_filter == 'Counciling done.' %}selected{% endif %}>Counciling done.</option>
           <option value="booking done." {% if status_filter == 'booking done.' %}selected{% endif %}>booking done.</option>
           <option value="need to follow up." {% if status_filter == 'need to follow up.' %}selected{% endif %}>need to follow up.</option>
+          <option value="Waiting for COMEDK" {% if status_filter == 'Waiting for COMEDK' %}selected{% endif %}>Waiting for COMEDK</option>
+          <option value="Waiting for CET" {% if status_filter == 'Waiting for CET' %}selected{% endif %}>Waiting for CET</option>
         </select>
         <label for="follow-up-date-filter">Follow Up Date:</label>
         <input type="date" name="follow_up_date" id="follow-up-date-filter" value="{{ follow_up_date_filter | default('', true) }}" onchange="this.form.submit()" style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;" />
@@ -336,6 +347,10 @@
         {% if follow_up_date_filter %}
           <a href="{{ url_for('dashboard', status=status_filter) }}" class="clear-date-filter-link">Clear Date Filter</a>
         {% endif %}
+        <div style="width: 100%; display: flex; align-items: center; gap: 20px;">
+          <label for="search-query">Search by Student Name:</label>
+          <input type="text" name="search_query" id="search-query" value="{{ search_query | default('', true) }}" placeholder="Enter student name" onchange="this.form.submit()" style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; transition: border-color 0.2s, box-shadow 0.2s;" />
+        </div>
       </form>
       {% if enquiries %}
       <form method="POST" action="{{ url_for('dashboard') }}" id="status-form">
@@ -353,7 +368,7 @@
             </thead>
             <tbody>
               {% for enquiry in enquiries %}
-              <tr class="{% if enquiry.status == 'Waiting for counseling' %}row-waiting{% elif enquiry.status == 'Counciling done.' %}row-counseling-done{% elif enquiry.status == 'booking done.' %}row-booking-done{% elif enquiry.status == 'need to follow up.' %}row-follow-up{% endif %}">
+              <tr class="{% if enquiry.status == 'Waiting for counseling' %}row-waiting{% elif enquiry.status == 'Counciling done.' %}row-counseling-done{% elif enquiry.status == 'booking done.' %}row-booking-done{% elif enquiry.status == 'need to follow up.' %}row-follow-up{% elif enquiry.status == 'Waiting for COMEDK' %}row-waiting-for-comedk{% elif enquiry.status == 'Waiting for CET' %}row-waiting-for-cet{% endif %}">
                 <td>
                   <a href="{{ url_for('edit_enquiry', enquiry_id=enquiry.id) }}"
                     >{{ enquiry.token_number | default('', true) }}</a
@@ -367,6 +382,8 @@
                     <option value="Counciling done." {% if enquiry.status == 'Counciling done.' %}selected{% endif %} style="color: #059669; background: #d1fae5;">Counciling done.</option>
                     <option value="booking done." {% if enquiry.status == 'booking done.' %}selected{% endif %} style="color: #ea580c; background: #ffedd5;">booking done.</option>
                     <option value="need to follow up." {% if enquiry.status == 'need to follow up.' %}selected{% endif %} style="color: #dc2626; background: #fee2e2;">need to follow up.</option>
+                    <option value="Waiting for COMEDK" {% if enquiry.status == 'Waiting for COMEDK' %}selected{% endif %} style="color: #a16207; background: #fef9c3;">Waiting for COMEDK</option>
+                    <option value="Waiting for CET" {% if enquiry.status == 'Waiting for CET' %}selected{% endif %} style="color: #16a34a; background: #ffafcc;">Waiting for CET</option>
                   </select>
                 </td>
                 <td>
