@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, a
 from supabase import create_client, Client
 from datetime import datetime
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -73,85 +74,74 @@ def dashboard():
 
     user_id = session['user']['id']
     user_role = session.get('role', '')
-    # Check if connected is in session and is False
     connected = session.get('connected', True)
     error = None
     enquiries = []
-
-    if request.method == 'POST':
-        if request.form.get('status_update'):
-            # Process status updates
-            try:
-                for key, value in request.form.items():
-                    if key.startswith('status_'):
-                        index = key.replace('status_', '')
-                        enquiry_id = request.form.get(f'enquiry_id_{index}')
-                        new_status = value
-                        new_remarks = request.form.get(f'remarks_{index}')
-                        new_follow_up_date = request.form.get(f'follow_up_date_{index}')
-
-                        if enquiry_id and new_status:
-                            update_data = {
-                                'status': new_status,
-                                'updated_at': datetime.now().isoformat()
-                            }
-                            # Add remarks to update data if it's available
-                            if new_remarks is not None:
-                                update_data['remarks'] = new_remarks
-                            # Add follow_up_date to update data if it's available
-                            if new_follow_up_date:
-                                update_data['follow_up_date'] = new_follow_up_date
-                            else:
-                                update_data['follow_up_date'] = None # Ensure it's set to null if empty
-
-                            update_response = supabase.table('admission_enquiries').update(update_data).eq('id', enquiry_id).execute()
-                            print(f"Update response for dashboard: {update_response}") # Added print for debugging
-                            if hasattr(update_response, 'error') and update_response.error:
-                                error = f"Error updating status for ID {enquiry_id}: {update_response.error}"
-                                print(error) # Log the error for debugging
-                # Redirect to dashboard (GET request) after updates to show fresh data
-                return redirect(url_for('dashboard'))
-            except Exception as e:
-                error = f"An unexpected error occurred during status update: {e}"
-                print(error) # Log the error for debugging
+    available_ranges = []
+    selected_range = request.args.get('range')
+    token_date = request.args.get('token_date')
+    page = int(request.args.get('page', 1))
+    per_page = 25
+    total_pages = 1
 
     if connected:
         try:
-            # Get filter status from request arguments
             status_filter = request.args.get('status')
             follow_up_date_filter = request.args.get('follow_up_date')
             search_query = request.args.get('search_query')
 
+            # Get all token numbers to compute ranges
+            all_tokens_data = supabase.table('admission_enquiries').select('token_number').execute()
+            all_token_numbers = [row['token_number'] for row in all_tokens_data.data if row.get('token_number')]
+            # Extract date prefixes (e.g., 07/06/2025 from 07/06/2025/01)
+            date_prefixes = set()
+            for token in all_token_numbers:
+                match = re.match(r'^(\d{2}/\d{2}/\d{4})', token)
+                if match:
+                    date_prefixes.add(match.group(1))
+            available_ranges = sorted(date_prefixes, key=lambda d: [int(x) for x in d.split('/')][::-1])  # Sort by date descending
+
             # Base query
             query = supabase.table('admission_enquiries').select('*')
 
-            # Apply filter if status is provided and not 'All'
+            # Apply range filter if selected
+            if selected_range:
+                query = query.ilike('token_number', f"{selected_range}%")
+
+            # Apply other filters
             if status_filter and status_filter != 'All':
                 query = query.eq('status', status_filter)
-
-            # Apply follow_up_date filter if provided
             if follow_up_date_filter:
                 query = query.eq('follow_up_date', follow_up_date_filter)
-            
-            # Apply search filter if search_query is provided
             if search_query:
                 query = query.ilike('student_name', f"%{search_query}%")
 
-            # Order by token_number in ascending order
-            query = query.order('token_number', desc=False)
+            # Apply token_date filter if provided
+            if token_date:
+                # Convert yyyy-mm-dd to dd/mm/yyyy
+                try:
+                    parts = token_date.split('-')
+                    if len(parts) == 3:
+                        date_prefix = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                        query = query.ilike('token_number', f"{date_prefix}%")
+                except Exception as e:
+                    pass
 
+            query = query.order('token_number', desc=True)
             data = query.execute()
-            enquiries = data.data
+            all_enquiries = data.data
+            total_entries = len(all_enquiries)
+            total_pages = max(1, (total_entries + per_page - 1) // per_page)
+            start = (page - 1) * per_page
+            end = start + per_page
+            enquiries = all_enquiries[start:end]
 
         except Exception as e:
-            # Handle potential exceptions during Supabase interaction
             error = f"Database error: {e}"
             enquiries = []
-            connected = False # Indicate disconnection due to error
+            connected = False
 
-    # Pass connected status, error, and enquiries to the template
-    # Also pass the selected status filter and follow_up_date_filter to the template
-    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query, user_role=user_role)
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query, user_role=user_role, available_ranges=available_ranges, selected_range=selected_range, token_date=token_date, page=page, total_pages=total_pages)
 
 @app.route('/student_details/<enquiry_id>')
 @require_admin_or_councellor
