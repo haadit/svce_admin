@@ -488,6 +488,13 @@
               background: none !important; /* Remove background for print */
           }
       }
+      .save-disabled {
+        opacity: 0.4 !important;
+        pointer-events: none !important;
+        background: #ccc !important;
+        color: #888 !important;
+        cursor: not-allowed !important;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -754,7 +761,7 @@
             <tr>
               <th>Preference</th>
               <th style="width: 40%;">Course</th> {# Give more width to Course #}
-              <th style="width: 20%;">Annual Fees</th> {# Equal width for these 3 #}
+              <th style="width: 20%;">Actual Fees</th> {# Equal width for these 3 #}
               <th style="width: 20%;"></th> {# Empty column 1 #}
               <th style="width: 20%;"></th> {# Empty column 2 #}
             </tr>
@@ -1322,7 +1329,7 @@
          </div>
 
          <div class="button-group">
-           <button type="submit" class="print-hidden">Save Changes</button>
+           <button type="submit" class="print-hidden{% if user_role == 'councellor' %} save-disabled{% endif %}" {% if user_role == 'councellor' %}disabled{% endif %}>Save Changes</button>
          </div>
        </form>
 

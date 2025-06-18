@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, abort
 from supabase import create_client, Client
 from datetime import datetime
 from dotenv import load_dotenv
@@ -16,19 +16,26 @@ app = Flask(__name__)
 # In a real app, use a strong random key from environment variables
 app.secret_key = 'your_secret_key_here'
 
-# --- Basic Admin Authentication (for demonstration) ---
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+# --- Multi-User Authentication ---
+USERS = {
+    'admin1': {'password': os.environ.get('ADMIN1_PASSWORD'), 'role': 'admin'},
+    'admin2': {'password': os.environ.get('ADMIN2_PASSWORD'), 'role': 'admin'},
+    'councellor1': {'password': os.environ.get('COUNCELLOR1_PASSWORD'), 'role': 'councellor'},
+    'councellor2': {'password': os.environ.get('COUNCELLOR2_PASSWORD'), 'role': 'councellor'},
+}
 
 def is_admin():
-    return session.get('logged_in')
+    return session.get('logged_in') and session.get('role') == 'admin'
 
-def require_admin(func):
+def is_councellor():
+    return session.get('logged_in') and session.get('role') == 'councellor'
+
+def require_admin_or_councellor(func):
     def wrapper(*args, **kwargs):
-        if not is_admin():
+        if not session.get('logged_in'):
             return redirect(url_for('login'))
         return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__ # Preserve original function name for Flask routing
+    wrapper.__name__ = func.__name__
     return wrapper
 
 @app.route('/')
@@ -40,10 +47,11 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        user = USERS.get(username)
+        if user and password == user['password']:
             session['logged_in'] = True
-            # Set a placeholder user in session for the dashboard check
-            session['user'] = {'id': username} # Use username as a simple ID
+            session['user'] = {'id': username}
+            session['role'] = user['role']
             return redirect(url_for('dashboard'))
         else:
             error = "Invalid credentials. Please try again."
@@ -53,15 +61,18 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    session.pop('user', None)
+    session.pop('role', None)
     return redirect(url_for('login'))
 
 @app.route('/dashboard', methods=['GET', 'POST'])
-@require_admin
+@require_admin_or_councellor
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
 
     user_id = session['user']['id']
+    user_role = session.get('role', '')
     # Check if connected is in session and is False
     connected = session.get('connected', True)
     error = None
@@ -140,10 +151,10 @@ def dashboard():
 
     # Pass connected status, error, and enquiries to the template
     # Also pass the selected status filter and follow_up_date_filter to the template
-    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query)
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query, user_role=user_role)
 
 @app.route('/student_details/<enquiry_id>')
-@require_admin
+@require_admin_or_councellor
 def student_details(enquiry_id):
     try:
         data = supabase.from_('admission_enquiries').select('*').eq('id', enquiry_id).single().execute()
@@ -168,7 +179,7 @@ def student_details(enquiry_id):
     return render_template('student_details.html', connected=connected, student_name=student_name, course_preferences=course_preferences, error=error_message)
 
 @app.route('/edit_enquiry/<enquiry_id>', methods=['GET', 'POST'])
-@require_admin
+@require_admin_or_councellor
 def edit_enquiry(enquiry_id):
     error_message = None
     connected = True
@@ -192,6 +203,7 @@ def edit_enquiry(enquiry_id):
         "12th",
         "Diploma"
     ]
+    user_role = session.get('role', '')
     try:
         if request.method == 'POST':
             form_data = request.form
@@ -299,8 +311,42 @@ def edit_enquiry(enquiry_id):
         current_preferences = {}
         error_message = f"An unexpected error occurred: {e}"
         print(f"Unexpected error in edit_enquiry: {e}")
-    return render_template('edit_enquiry.html', connected=connected, enquiry=enquiry, course_preferences=course_preferences_list, all_courses=all_courses, current_preferences=current_preferences, error=error_message, education_board_options=education_board_options, education_qualification_options=education_qualification_options)
+    return render_template('edit_enquiry.html', connected=connected, enquiry=enquiry, course_preferences=course_preferences_list, all_courses=all_courses, current_preferences=current_preferences, error=error_message, education_board_options=education_board_options, education_qualification_options=education_qualification_options, user_role=user_role)
 
+@app.route('/delete_enquiry/<enquiry_id>', methods=['POST'])
+@require_admin_or_councellor
+def delete_enquiry(enquiry_id):
+    # Only allow admin role to delete
+    if session.get('role') != 'admin':
+        abort(403)
+    try:
+        response = supabase.table('admission_enquiries').delete().eq('id', enquiry_id).execute()
+        # Optionally, check response for errors
+    except Exception as e:
+        print(f"Error deleting enquiry {enquiry_id}: {e}")
+    return redirect(url_for('dashboard'))
+
+@app.route('/change_password', methods=['GET', 'POST'])
+@require_admin_or_councellor
+def change_password():
+    username = session['user']['id']
+    user = USERS.get(username)
+    message = None
+    error = None
+    if request.method == 'POST':
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        if not old_password or not new_password or not confirm_password:
+            error = 'All fields are required.'
+        elif old_password != user['password']:
+            error = 'Old password is incorrect.'
+        elif new_password != confirm_password:
+            error = 'New passwords do not match.'
+        else:
+            USERS[username]['password'] = new_password
+            message = 'Password changed successfully!'
+    return render_template('change_password.html', message=message, error=error)
 
 if __name__ == '__main__':
     # Use debug=True only for development
