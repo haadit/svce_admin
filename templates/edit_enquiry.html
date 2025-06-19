@@ -1328,6 +1328,65 @@
            {% endfor %}
          </div>
 
+         <div class="row">
+           <div class="form-group">
+             <label for="course_interested_in">Course Interested In:</label>
+             <select id="course_interested_in" name="course_interested_in" class="styled-select" onchange="toggleCourseTypeSections()">
+               <option value="">-- Select --</option>
+               <option value="UG Course" {% if enquiry.course_interested_in == 'UG Course' %}selected{% endif %}>UG Course</option>
+               <option value="PG Course" {% if enquiry.course_interested_in == 'PG Course' %}selected{% endif %}>PG Course</option>
+             </select>
+           </div>
+         </div>
+         <div id="ug-section" style="display: none;">
+           <div class="section-title">UG Details</div>
+           <div class="row">
+             <div class="form-group">
+               <label for="ug_percentage">UG Percentage:</label>
+               <input type="number" id="ug_percentage" name="ug_percentage" value="{{ enquiry.ug_percentage | default('', true) }}" step="any">
+             </div>
+             <div class="form-group">
+               <label for="pg_12th_percentage">12th Percentage:</label>
+               <input type="number" id="pg_12th_percentage" name="pg_12th_percentage" value="{{ enquiry.pg_12th_percentage | default('', true) }}" step="any">
+             </div>
+           </div>
+           <div class="row">
+             <div class="form-group">
+               <label for="pg_course_applying_for">Course Applying For:</label>
+               <select id="pg_course_applying_for" name="pg_course_applying_for" class="styled-select">
+                 <option value="">-- Select --</option>
+                 <option value="MBA" {% if enquiry.pg_course_applying_for == 'MBA' %}selected{% endif %}>MBA</option>
+                 <option value="MCA" {% if enquiry.pg_course_applying_for == 'MCA' %}selected{% endif %}>MCA</option>
+                 <option value="M.TECH" {% if enquiry.pg_course_applying_for == 'M.TECH' %}selected{% endif %}>M.TECH</option>
+               </select>
+             </div>
+           </div>
+         </div>
+         <div id="pg-section" style="display: none;">
+           <div class="section-title">PG Details</div>
+           <div class="row">
+             <div class="form-group">
+               <label for="ug_percentage">UG Percentage:</label>
+               <input type="number" id="ug_percentage" name="ug_percentage" value="{{ enquiry.ug_percentage | default('', true) }}" step="any">
+             </div>
+             <div class="form-group">
+               <label for="pg_12th_percentage">12th Percentage:</label>
+               <input type="number" id="pg_12th_percentage" name="pg_12th_percentage" value="{{ enquiry.pg_12th_percentage | default('', true) }}" step="any">
+             </div>
+           </div>
+           <div class="row">
+             <div class="form-group">
+               <label for="pg_course_applying_for">Course Applying For:</label>
+               <select id="pg_course_applying_for" name="pg_course_applying_for" class="styled-select">
+                 <option value="">-- Select --</option>
+                 <option value="MBA" {% if enquiry.pg_course_applying_for == 'MBA' %}selected{% endif %}>MBA</option>
+                 <option value="MCA" {% if enquiry.pg_course_applying_for == 'MCA' %}selected{% endif %}>MCA</option>
+                 <option value="M.TECH" {% if enquiry.pg_course_applying_for == 'M.TECH' %}selected{% endif %}>M.TECH</option>
+               </select>
+             </div>
+           </div>
+         </div>
+
          <div class="button-group">
            <button type="submit" class="print-hidden{% if user_role == 'councellor' %} save-disabled{% endif %}" {% if user_role == 'councellor' %}disabled{% endif %}>Save Changes</button>
          </div>
@@ -1528,6 +1587,23 @@
            }
          }
        }
+
+       function toggleCourseTypeSections() {
+         var courseType = document.getElementById('course_interested_in').value;
+         var ugSection = document.getElementById('ug-section');
+         var pgSection = document.getElementById('pg-section');
+         if (courseType === 'UG Course') {
+           if (ugSection) ugSection.style.display = '';
+           if (pgSection) pgSection.style.display = 'none';
+         } else if (courseType === 'PG Course') {
+           if (ugSection) ugSection.style.display = 'none';
+           if (pgSection) pgSection.style.display = '';
+         } else {
+           if (ugSection) ugSection.style.display = 'none';
+           if (pgSection) pgSection.style.display = 'none';
+         }
+       }
+       document.addEventListener('DOMContentLoaded', toggleCourseTypeSections);
      </script>
    </body>
  </html>
