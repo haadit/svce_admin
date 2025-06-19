@@ -141,6 +141,41 @@ def dashboard():
             enquiries = []
             connected = False
 
+    if request.method == 'POST':
+        if request.form.get('status_update'):
+            # Process status updates
+            try:
+                for key, value in request.form.items():
+                    match = re.match(r'status_([0-9a-fA-F-]{36})$', key)
+                    if match:
+                        enquiry_id = match.group(1)
+                        new_status = value
+                        new_remarks = request.form.get(f'remarks_{enquiry_id}')
+                        new_follow_up_date = request.form.get(f'follow_up_date_{enquiry_id}')
+
+                        if enquiry_id and new_status:
+                            update_data = {
+                                'status': new_status,
+                                'updated_at': datetime.now().isoformat()
+                            }
+                            # Add remarks to update data if it's available
+                            if new_remarks is not None:
+                                update_data['remarks'] = new_remarks
+                            # Add follow_up_date to update data if it's available
+                            if new_follow_up_date:
+                                update_data['follow_up_date'] = new_follow_up_date
+                            else:
+                                update_data['follow_up_date'] = None # Ensure it's set to null if empty
+
+                            update_response = supabase.table('admission_enquiries').update(update_data).eq('id', enquiry_id).execute()
+                            print(f"Update response for dashboard: {update_response}") # Added print for debugging
+                            if hasattr(update_response, 'error') and update_response.error:
+                                error = f"Error updating status for ID {enquiry_id}: {update_response.error}"
+                                print(error) # Log the error for debugging
+            except Exception as e:
+                error = f"Error processing status updates: {e}"
+                print(error)
+
     return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query, user_role=user_role, available_ranges=available_ranges, selected_range=selected_range, token_date=token_date, page=page, total_pages=total_pages)
 
 @app.route('/student_details/<enquiry_id>')
