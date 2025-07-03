@@ -127,7 +127,8 @@ def dashboard():
                 except Exception as e:
                     pass
 
-            query = query.order('token_number', desc=True)
+            # Sort by created_at descending to show latest entries first
+            query = query.order('created_at', desc=True)
             data = query.execute()
             all_enquiries = data.data
             total_entries = len(all_enquiries)

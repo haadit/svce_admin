@@ -928,7 +928,7 @@
           </div>
         </div>
         <div class="row full-width">
-          <div class="form-group">
+            <div class="form-group">
             <label for="status">Status:</label>
             <select id="status" name="status" class="styled-select">
               <option value="">Select Status</option>
@@ -946,23 +946,23 @@
               </option>
               {% endfor %}
             </select>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="form-group">
-            <label for="education_board">Education Board (12th):</label>
-            <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
-              <option value="">Select Board</option>
-              {% set current_board = enquiry.education_board|default('', true) %}
-              {% if current_board and current_board not in education_board_options %}
-                <option value="{{ current_board }}" selected>{{ current_board }}</option>
-              {% endif %}
-              {% for board in education_board_options %}
-                <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
-              {% endfor %}
-            </select>
+          <div class="row">
+            <div class="form-group">
+              <label for="education_board">Education Board (12th):</label>
+              <select id="education_board" name="education_board" onchange="toggle11thFields()" class="styled-select">
+                <option value="">Select Board</option>
+                {% set current_board = enquiry.education_board|default('', true) %}
+                {% if current_board and current_board not in education_board_options %}
+                  <option value="{{ current_board }}" selected>{{ current_board }}</option>
+                {% endif %}
+                {% for board in education_board_options %}
+                  <option value="{{ board }}" {% if current_board == board %}selected{% endif %}>{{ board }}</option>
+                {% endfor %}
+              </select>
+            </div>
           </div>
-        </div>
         <div id="section12thStandard">
           <div class="section-title">12th Standard: (Physics, Chemistry, and Mathematics are mandatory)</div>
           <div class="row three-cols" id="row12thPCM">
