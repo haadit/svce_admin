@@ -352,6 +352,50 @@
         background: #388bff;
         color: #fff;
       }
+      
+      /* Switch Styles - Simple pill without text */
+      .switch-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        width: 72px;
+        height: 36px;
+        padding: 2px;
+        border-radius: 999px;
+        background: #e6ecff;
+        border: 1.5px solid #c7d2fe;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+      }
+
+      .switch-input { display: none; }
+
+      .switch-label {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 999px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .switch-thumb {
+        position: absolute;
+        height: 32px;
+        width: 32px;
+        top: 2px;
+        left: 2px;
+        background: #3b82f6; /* blue */
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(59,130,246,0.35);
+        transition: transform 200ms ease, background 200ms ease, box-shadow 200ms ease;
+      }
+
+      .switch-input:checked + .switch-label .switch-thumb {
+        transform: translateX(36px);
+        background: #10b981; /* green */
+        box-shadow: 0 4px 10px rgba(16,185,129,0.35);
+      }
     </style>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
@@ -384,6 +428,7 @@
           <option value="Waiting for COMEDK" {% if status_filter == 'Waiting for COMEDK' %}selected{% endif %}>Waiting for COMEDK</option>
           <option value="Waiting for CET" {% if status_filter == 'Waiting for CET' %}selected{% endif %}>Waiting for CET</option>
         </select>
+        <!-- Course Type filter removed - filtering is now handled by the token format switch -->
         <label for="token-date-picker">Token Date:</label>
         <input type="date" name="token_date" id="token-date-picker" value="{{ token_date | default('', true) }}" onchange="this.form.submit()" style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; transition: border-color 0.2s, box-shadow 0.2s;" />
         <label for="follow-up-date-filter">Follow Up Date:</label>
@@ -398,6 +443,16 @@
         <div style="width: 100%; display: flex; align-items: center; gap: 20px;">
           <label for="search-query">Search by Student Name:</label>
           <input type="text" name="search_query" id="search-query" value="{{ search_query | default('', true) }}" placeholder="Enter student name" onchange="this.form.submit()" style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; transition: border-color 0.2s, box-shadow 0.2s;" />
+          <div style="display: inline-flex; align-items: center; gap: 10px; margin-left: auto;">
+            <label for="token-format-toggle" style="font-weight: 600; color: #3b4a5a;">PG/UG</label>
+            <div class="switch-container" title="Toggle token display format">
+              <input type="checkbox" id="token-format-toggle" class="switch-input" {% if token_format == 'tkn' %}checked{% endif %} onchange="toggleTokenFormat()" />
+              <label for="token-format-toggle" class="switch-label">
+                <span class="switch-thumb"></span>
+              </label>
+            </div>
+            <input type="hidden" name="token_format" id="token-format-hidden" value="{{ token_format }}" />
+          </div>
         </div>
       </form>
       {% if enquiries %}
@@ -419,9 +474,12 @@
               {% for enquiry in enquiries %}
               <tr class="{% if enquiry.status == 'Waiting for counseling' %}row-waiting{% elif enquiry.status == 'Counciling done.' %}row-counseling-done{% elif enquiry.status == 'booking done.' %}row-booking-done{% elif enquiry.status == 'need to follow up.' %}row-follow-up{% elif enquiry.status == 'Waiting for COMEDK' %}row-waiting-for-comedk{% elif enquiry.status == 'Waiting for CET' %}row-waiting-for-cet{% endif %}">
                 <td>
-                  <a href="{{ url_for('edit_enquiry', enquiry_id=enquiry.id) }}"
-                    >{{ enquiry.token_number | default('', true) }}</a
-                  >
+                  {% set token_text = enquiry.token_number|format_token(token_format, enquiry) | default('', true) %}
+                  {% set is_pg_token = token_text.startswith('PG-') %}
+                  {% set pg_link = url_for('edit_enquiry', enquiry_id=enquiry.id, pg='1') %}
+                  {% set ug_link = url_for('edit_enquiry', enquiry_id=enquiry.id) %}
+                  {% set target_link = pg_link if is_pg_token or enquiry.pg_course_type or enquiry.pg_course_applying_for else ug_link %}
+                  <a href="{{ target_link }}">{{ token_text }}</a>
                   <input type="hidden" name="enquiry_id_{{ enquiry.id }}" value="{{ enquiry.id }}" />
                 </td>
                 <td>{{ enquiry.student_name | default('', true) }}</td>
@@ -481,6 +539,44 @@
         {% endif %}
       </div>
       <script>
+        function toggleTokenFormat() {
+          const toggle = document.getElementById('token-format-toggle');
+          const hidden = document.getElementById('token-format-hidden');
+          
+          // When checked, show TKN-yymmdd-n format (UG forms), when unchecked show PG-2025/08/21-2 format (PG forms)
+          hidden.value = toggle.checked ? 'tkn' : 'pg_date';
+          
+          // Apply client-side filtering based on switch position
+          filterTableByCourseType(toggle.checked);
+          
+          // Update the URL without page reload
+          updateURL();
+        }
+        
+        function filterTableByCourseType(showUG) {
+          const rows = document.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const tokenCell = row.querySelector('td:first-child a');
+            if (tokenCell) {
+              const tokenText = tokenCell.textContent.trim();
+              const isPGForm = tokenText.includes('PG-') || tokenText.includes('TKN-PG-');
+              
+              if (showUG) {
+                // Show UG forms (hide PG forms)
+                row.style.display = isPGForm ? 'none' : '';
+              } else {
+                // Show PG forms (hide UG forms)
+                row.style.display = isPGForm ? '' : 'none';
+              }
+            }
+          });
+        }
+        
+        function updateURL() {
+          const url = new URL(window.location);
+          url.searchParams.set('token_format', document.getElementById('token-format-hidden').value);
+          window.history.pushState({}, '', url);
+        }
         // Save button logic in header triggers main form submit
         const form = document.getElementById('status-form');
         const saveBtn = document.getElementById('save-status-btn');
@@ -539,6 +635,23 @@
           document.getElementById('search-query').value = '';
           document.getElementById('status-filter-form').submit();
         }
+        
+        // Initialize switch state based on current token format
+        document.addEventListener('DOMContentLoaded', function() {
+          const tokenFormatToggle = document.getElementById('token-format-toggle');
+          
+          if (tokenFormatToggle) {
+            // Set switch state based on current token format
+            const currentFormat = '{{ token_format }}';
+            if (currentFormat === 'tkn') {
+              tokenFormatToggle.checked = true;
+              filterTableByCourseType(true); // Show UG forms
+            } else {
+              tokenFormatToggle.checked = false;
+              filterTableByCourseType(false); // Show PG forms
+            }
+          }
+        });
       </script>
       {% else %}
       <p>No admission enquiries found.</p>

@@ -752,7 +752,7 @@
           </table>
         {% endif %}
 
-        <!-- Course Preference Order -->
+        <!- - Course Preference Order -->
         <table class="print-table" style="margin-top: 0px;">
           <thead>
             <tr>
@@ -1376,12 +1376,40 @@
            </div>
            <div class="row">
              <div class="form-group">
-               <label for="pg_course_applying_for">Course Applying For:</label>
+               <label for="ug_course">UG Course:</label>
+               <select id="ug_course" name="ug_course" class="styled-select">
+                 <option value="">-- Select --</option>
+                 <option value="BE Computer Science and Engineering" {% if enquiry.ug_course == 'BE Computer Science and Engineering' %}selected{% endif %}>BE Computer Science and Engineering</option>
+                 <option value="BE Computer Science and Engineering (Artificial Intelligence)" {% if enquiry.ug_course == 'BE Computer Science and Engineering (Artificial Intelligence)' %}selected{% endif %}>BE Computer Science and Engineering (Artificial Intelligence)</option>
+                 <option value="BE Computer Science and Engineering (Data Science)" {% if enquiry.ug_course == 'BE Computer Science and Engineering (Data Science)' %}selected{% endif %}>BE Computer Science and Engineering (Data Science)</option>
+                 <option value="BE Computer Science and Engineering (Cyber Security)" {% if enquiry.ug_course == 'BE Computer Science and Engineering (Cyber Security)' %}selected{% endif %}>BE Computer Science and Engineering (Cyber Security)</option>
+                 <option value="BE Information Science and Engineering" {% if enquiry.ug_course == 'BE Information Science and Engineering' %}selected{% endif %}>BE Information Science and Engineering</option>
+                 <option value="BE Electronics and Communication Engineering" {% if enquiry.ug_course == 'BE Electronics and Communication Engineering' %}selected{% endif %}>BE Electronics and Communication Engineering</option>
+                 <option value="BE Civil Engineering" {% if enquiry.ug_course == 'BE Civil Engineering' %}selected{% endif %}>BE Civil Engineering</option>
+                 <option value="BE Mechanical Engineering" {% if enquiry.ug_course == 'BE Mechanical Engineering' %}selected{% endif %}>BE Mechanical Engineering</option>
+                 <option value="Other" {% if enquiry.ug_course == 'Other' %}selected{% endif %}>Other</option>
+               </select>
+             </div>
+             <div class="form-group">
+               <label for="pg_course_applying_for">PG Course Applying For:</label>
                <select id="pg_course_applying_for" name="pg_course_applying_for" class="styled-select">
                  <option value="">-- Select --</option>
                  <option value="MBA" {% if enquiry.pg_course_applying_for == 'MBA' %}selected{% endif %}>MBA</option>
                  <option value="MCA" {% if enquiry.pg_course_applying_for == 'MCA' %}selected{% endif %}>MCA</option>
                  <option value="M.TECH" {% if enquiry.pg_course_applying_for == 'M.TECH' %}selected{% endif %}>M.TECH</option>
+               </select>
+             </div>
+           </div>
+           <div class="row">
+             <div class="form-group">
+               <label for="entrance_exam">Entrance Exam:</label>
+               <select id="entrance_exam" name="entrance_exam" class="styled-select">
+                 <option value="">-- Select --</option>
+                 <option value="PGCET" {% if enquiry.entrance_exam == 'PGCET' %}selected{% endif %}>PGCET</option>
+                 <option value="GATE" {% if enquiry.entrance_exam == 'GATE' %}selected{% endif %}>GATE</option>
+                 <option value="CAT" {% if enquiry.entrance_exam == 'CAT' %}selected{% endif %}>CAT</option>
+                 <option value="MAT" {% if enquiry.entrance_exam == 'MAT' %}selected{% endif %}>MAT</option>
+                 <option value="Other" {% if enquiry.entrance_exam == 'Other' %}selected{% endif %}>Other</option>
                </select>
              </div>
            </div>

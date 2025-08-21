@@ -17,6 +17,88 @@ app = Flask(__name__)
 # In a real app, use a strong random key from environment variables
 app.secret_key = 'your_secret_key_here'
 
+# --- Jinja Filters ---
+@app.template_filter('format_token')
+def format_token_filter(token, desired_format, enquiry=None):
+    try:
+        if not token or not isinstance(token, str):
+            return token or ''
+        token = token.strip()
+        
+        # Check if this is a PG form by looking at the enquiry object (supports both old and new columns)
+        is_pg_form = False
+        if enquiry and hasattr(enquiry, 'pg_course_type'):
+            is_pg_form = bool(getattr(enquiry, 'pg_course_type', None))
+        elif enquiry and hasattr(enquiry, 'pg_course_applying_for'):
+            is_pg_form = bool(getattr(enquiry, 'pg_course_applying_for', None))
+        elif enquiry and isinstance(enquiry, dict):
+            is_pg_form = bool(enquiry.get('pg_course_type') or enquiry.get('pg_course_applying_for'))
+        
+        if desired_format == 'tkn':
+            # For PG forms only, show compact TKN style; keep UG in default display
+            if is_pg_form:
+                # If already in PG TKN format, return as-is
+                if re.match(r'^TKN-PG-\d{6}-\d+$', token):
+                    return token
+                # Convert from dd/mm/yyyy/n -> TKN-PG-yymmdd-n
+                m = re.match(r'^(\d{2})/(\d{2})/(\d{4})/(\d+)$', token)
+                if m:
+                    dd, mm, yyyy, seq = m.groups()
+                    yy = yyyy[-2:]
+                    return f"TKN-PG-{yy}{mm}{dd}-{seq}"
+            # For UG, do not transform; show stored/default form
+            return token
+        elif desired_format == 'pg_date':
+            # New format: PG-2025/08/21-2 for PG forms
+            if is_pg_form:
+                if re.match(r'^PG-\d{4}/\d{2}/\d{2}-\d+$', token):
+                    return token
+                # Convert from dd/mm/yyyy/n -> PG-yyyy/mm/dd-n
+                m = re.match(r'^(\d{2})/(\d{2})/(\d{4})/(\d+)$', token)
+                if m:
+                    dd, mm, yyyy, seq = m.groups()
+                    return f"PG-{yyyy}/{mm}/{dd}-{seq}"
+                # Convert from TKN-PG-yymmdd-n -> PG-yyyy/mm/dd-n
+                m = re.match(r'^TKN-PG-(\d{2})(\d{2})(\d{2})-(\d+)$', token)
+                if m:
+                    yy, mm, dd, seq = m.groups()
+                    yyyy = f"20{yy}"
+                    return f"PG-{yyyy}/{mm}/{dd}-{seq}"
+                return token
+            else:
+                # For UG forms, keep the original date format
+                if re.match(r'^\d{2}/\d{2}/\d{4}/\d+$', token):
+                    return token
+                # Convert from TKN-yymmdd-n -> dd/mm/yyyy/n
+                m = re.match(r'^TKN-(\d{2})(\d{2})(\d{2})-(\d+)$', token)
+                if m:
+                    yy, mm, dd, seq = m.groups()
+                    yyyy = f"20{yy}"
+                    return f"{dd}/{mm}/{yyyy}/{seq}"
+                return token
+        else:
+            # desired_format == 'date' (legacy format)
+            if re.match(r'^\d{2}/\d{2}/\d{4}/\d+$', token):
+                return token
+            
+            # For PG forms, handle TKN-PG-yymmdd-n format
+            if is_pg_form:
+                m = re.match(r'^TKN-PG-(\d{2})(\d{2})(\d{2})-(\d+)$', token)
+                if m:
+                    yy, mm, dd, seq = m.groups()
+                    yyyy = f"20{yy}"
+                    return f"{dd}/{mm}/{yyyy}/{seq}"
+            
+            # For UG forms, handle TKN-yymmdd-n format
+            m = re.match(r'^TKN-(\d{2})(\d{2})(\d{2})-(\d+)$', token)
+            if m:
+                yy, mm, dd, seq = m.groups()
+                yyyy = f"20{yy}"
+                return f"{dd}/{mm}/{yyyy}/{seq}"
+            return token
+    except Exception:
+        return token
+
 # --- Multi-User Authentication ---
 USERS = {
     'admin1': {'password': os.environ.get('ADMIN1_PASSWORD'), 'role': 'admin'},
@@ -83,12 +165,14 @@ def dashboard():
     page = int(request.args.get('page', 1))
     per_page = 25
     total_pages = 1
+    # Ensure filters are always defined so the template can render even if a DB error occurs
+    status_filter = request.args.get('status')
+    follow_up_date_filter = request.args.get('follow_up_date')
+    search_query = request.args.get('search_query')
+    token_format = request.args.get('token_format', 'pg_date')  # 'tkn', 'pg_date', or 'date'
 
     if connected:
         try:
-            status_filter = request.args.get('status')
-            follow_up_date_filter = request.args.get('follow_up_date')
-            search_query = request.args.get('search_query')
 
             # Get all token numbers to compute ranges
             all_tokens_data = supabase.table('admission_enquiries').select('token_number').execute()
@@ -177,7 +261,7 @@ def dashboard():
                 error = f"Error processing status updates: {e}"
                 print(error)
 
-    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query, user_role=user_role, available_ranges=available_ranges, selected_range=selected_range, token_date=token_date, page=page, total_pages=total_pages)
+    return render_template('dashboard.html', connected=connected, error=error, enquiries=enquiries, status_filter=status_filter, follow_up_date_filter=follow_up_date_filter, today_date=datetime.now().date().isoformat(), search_query=search_query, user_role=user_role, available_ranges=available_ranges, selected_range=selected_range, token_date=token_date, page=page, total_pages=total_pages, token_format=token_format)
 
 @app.route('/student_details/<enquiry_id>')
 @require_admin_or_councellor
@@ -234,6 +318,7 @@ def edit_enquiry(enquiry_id):
         if request.method == 'POST':
             form_data = request.form
             # Update admission_enquiries table
+            # Build update payload. Only include PG or UG fields that exist for the chosen form
             enquiry_update_data = {
                 'enquiry_date': form_data.get('enquiry_date'),
                 'student_name': form_data.get('student_name'),
@@ -247,10 +332,17 @@ def edit_enquiry(enquiry_id):
                 'reference': form_data.get('reference'),
                 'educational_qualification': form_data.get('education_qualification'),
                 'status': form_data.get('status'),
-                'course_interested_in': form_data.get('course_interested_in'),
+                # UG fields (will remain None if not in form)
                 'ug_percentage': form_data.get('ug_percentage'),
+                'ug_course': form_data.get('ug_course'),
+                # PG fields (new naming based on DB: pg_course_type, ug_course_type, ug_cgpa)
+                'pg_course_type': form_data.get('pg_course_type'),
+                'ug_course_type': form_data.get('ug_course_type'),
+                'ug_cgpa': form_data.get('ug_cgpa'),
+                # Back-compat fields if older columns present
                 'pg_12th_percentage': form_data.get('pg_12th_percentage'),
                 'pg_course_applying_for': form_data.get('pg_course_applying_for'),
+                'entrance_exam': form_data.get('entrance_exam'),
                 'physics_marks': form_data.get('physics_marks') or None,
                 'chemistry_marks': form_data.get('chemistry_marks') or None,
                 'mathematics_marks': form_data.get('mathematics_marks') or None,
@@ -341,7 +433,25 @@ def edit_enquiry(enquiry_id):
         current_preferences = {}
         error_message = f"An unexpected error occurred: {e}"
         print(f"Unexpected error in edit_enquiry: {e}")
-    return render_template('edit_enquiry.html', connected=connected, enquiry=enquiry, course_preferences=course_preferences_list, all_courses=all_courses, current_preferences=current_preferences, error=error_message, education_board_options=education_board_options, education_qualification_options=education_qualification_options, user_role=user_role)
+    # Decide which template to render (PG or UG) based on data
+    is_pg_form = False
+    try:
+        if enquiry:
+            # Prefer explicit PG course field present in DB
+            is_pg_form = bool(enquiry.get('pg_course_type') or enquiry.get('pg_course_applying_for'))
+            # Fallback: infer from token pattern shown on dashboard if stored in token_number
+            tok = enquiry.get('token_number') or ''
+            if isinstance(tok, str) and tok.startswith('PG-'):
+                is_pg_form = True
+            # Optional override via query param
+            if request.args.get('pg') == '1':
+                is_pg_form = True
+    except Exception:
+        is_pg_form = False
+
+    template_name = 'edit_enquiry_pg.html' if is_pg_form else 'edit_enquiry.html'
+
+    return render_template(template_name, connected=connected, enquiry=enquiry, course_preferences=course_preferences_list, all_courses=all_courses, current_preferences=current_preferences, error=error_message, education_board_options=education_board_options, education_qualification_options=education_qualification_options, user_role=user_role)
 
 @app.route('/delete_enquiry/<enquiry_id>', methods=['POST'])
 @require_admin_or_councellor

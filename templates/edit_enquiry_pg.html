@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit Enquiry (PG)</title>
+    <style>
+      body { font-family: "Roboto", sans-serif; line-height: 1.6; margin: 0; background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%); color: #333; min-height: 100vh; }
+      .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 38px 38px 30px 38px; border-radius: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); border-top: 4px solid #388bff; }
+      h2 { text-align: center; color: #2d3a4a; margin-bottom: 32px; font-size: 2.1rem; letter-spacing: 1px; }
+      .form-group { margin-bottom: 22px; }
+      label { display: block; margin-bottom: 8px; font-weight: 500; color: #3b4a5a; font-size: 1.08em; }
+      input[type="text"], input[type="email"], input[type="number"], input[type="date"], textarea { width: 100%; padding: 12px; border: 2px solid #c7d2fe; border-radius: 6px; box-sizing: border-box; font-size: 1.05em; background: #f8fafc; transition: border 0.2s; }
+      input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, input[type="date"]:focus, textarea:focus { border: 1.8px solid #007bff; outline: none; background: #fff; }
+      .styled-select { width: 100%; padding: 12px; border: 2px solid #c7d2fe; border-radius: 6px; box-sizing: border-box; font-size: 1.05em; background: #f8fafc; transition: border 0.2s; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 12px auto; display: block; height: auto; }
+      .styled-select:focus { border: 2px solid #007bff; outline: none; background: #fff; }
+      textarea { resize: vertical; min-height: 100px; }
+      .row { display: flex; flex-wrap: wrap; gap: 20px; }
+      .row > .form-group { flex: 1 1 calc(50% - 10px); }
+      .full-width { flex: 1 1 100%; }
+      .section-title { margin-top: 24px; margin-bottom: 12px; font-size: 1.15rem; color: #007bff; border-bottom: 2px solid #e0e7ff; padding-bottom: 6px; font-weight: 600; letter-spacing: 0.5px; }
+      .button-group { margin-top: 6px; text-align: right; }
+      button { background-color: #007bff; color: #fff; padding: 12px 26px; border: none; border-radius: 6px; cursor: pointer; font-size: 1.08em; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.07); transition: background 0.2s; }
+      button:hover { background-color: #0056b3; }
+      .back-link { display: inline-block; margin-bottom: 0; background: #e3edff; color: #1a237e; padding: 10px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 1.08em; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: background 0.2s; }
+
+      /* Print helpers (same scheme as UG) */
+      .print-only { display: none; }
+      .print-only-inline { display: none; }
+      .print-table { width: 100%; border-collapse: collapse; margin-top: 0 !important; margin-bottom: 0 !important; border: 1px solid #666; }
+      .print-table th, .print-table td { border: 1px solid #666; padding: 2px 4px; text-align: left; line-height: 1.2; }
+      .print-table th { background-color: #f2f2f2; font-weight: bold; }
+      .section-title-print { background-color: #e0e7ff; color: #007bff; font-size: 1.1em; padding: 8px; font-weight: 600; }
+
+      @media print {
+        @page { margin: 0.5cm; }
+        .button-group, .print-btn, .back-link, .print-hidden, form { display: none !important; }
+        .print-only { display: block !important; }
+        .print-only-inline { display: block !important; }
+        .created-at-print { display: flex !important; visibility: visible !important; justify-content: flex-end !important; width: 100% !important; margin: 0 0 8px 0 !important; position: static !important; text-align: right !important; z-index: 9999 !important; box-sizing: border-box !important; }
+        body { background: #fff !important; font-size: 12.5px !important; margin: 0 !important; padding: 0 !important; }
+        .container { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 4px !important; max-width: 100vw !important; width: auto !important; }
+        .row { gap: 2.5px !important; margin-bottom: 2.5px !important; }
+        input, textarea, select { font-size: 0.9em !important; padding: 3px 5px !important; }
+        label { font-size: 0.9em !important; margin-bottom: 1px !important; }
+      }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-section" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 18px;">
+        <img src="{{ url_for('static', filename='college_logo.png') }}" alt="College Logo" style="max-width: 380px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 8px;" />
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="{{ url_for('dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+          <button type="button" onclick="window.print()" class="print-btn" style="font-size: 1.1em; font-weight: 600; padding: 12px 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #388bff;"> <i class="fa fa-print"></i> Print</button>
+        </div>
+      </div>
+
+      <div class="details-section" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; margin-top: 8px;">
+        <div style="font-size: 0.9rem; font-weight: 500; color: #222;">Token No.: <span style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600;">{{ enquiry.token_number | default('', true) }}</span></div>
+        <div class="print-hidden" style="font-size: 0.8rem; font-weight: 500; color: #222; display: flex; align-items: center; gap: 8px;">
+          <label for="enquiry_date" style="margin: 0; font-weight: 500;">Date:</label>
+          <input type="date" id="enquiry_date" name="enquiry_date" value="{{ enquiry.enquiry_date | default('', true) }}" style="background: #f4f6fa; padding: 4px 10px; border-radius: 6px; font-weight: 600; border: 1px solid #c7d2fe; font-size: 1.08em; color: #222;" />
+        </div>
+      </div>
+
+      {% if not connected %}
+        <p class="error-message">Failed to load enquiry details.</p>
+      {% elif enquiry is none %}
+        <p class="error-message">Enquiry not found.</p>
+      {% else %}
+
+      <!-- Print layout for PG -->
+      <div class="print-only">
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Personal Details</th>
+              <th colspan="2" class="section-title-print">Contact Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Full Name:</td><td>{{ enquiry.student_name | default('N/A', true) }}</td>
+              <td>Student Email:</td><td>{{ enquiry.student_email | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td>Father's Name:</td><td>{{ enquiry.father_name | default('N/A', true) }}</td>
+              <td>Student Mobile:</td><td>{{ enquiry.student_mobile | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td>Mother's Name:</td><td>{{ enquiry.mother_name | default('N/A', true) }}</td>
+              <td>Address:</td><td>{{ enquiry.address | default('N/A', true) }}</td>
+            </tr>
+            <tr>
+              <td>Reference:</td><td>{{ enquiry.reference | default('N/A', true) }}</td>
+              <td>Status:</td><td>{{ enquiry.status | default('N/A', true) }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="print-table" style="margin-top: 0px;">
+          <thead>
+            <tr>
+              <th colspan="3" class="section-title-print">PG Details</th>
+            </tr>
+            <tr>
+              <th>PG Course</th>
+              <th>UG Course</th>
+              <th>UG CGPA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ enquiry.pg_course_type or enquiry.pg_course_applying_for | default('N/A', true) }}</td>
+              <td>{{ enquiry.ug_course_type | default('N/A', true) }}</td>
+              <td>{{ enquiry.ug_cgpa | default('N/A', true) }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="print-table" style="margin-top: 0px;">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Entrance Exam</th>
+            </tr>
+            <tr>
+              <th>Exam</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ enquiry.entrance_exam | default('N/A', true) }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <form method="POST">
+        <!-- keep important hidden fields so updates don't wipe them -->
+        <input type="hidden" name="status" value="{{ enquiry.status | default('', true) }}" />
+        <input type="hidden" name="education_qualification" value="{{ enquiry.educational_qualification | default('', true) }}" />
+        <!-- marker for PG; not saved but indicates intent on submit if needed -->
+        <input type="hidden" name="is_pg_form" value="1" />
+
+        <div class="row">
+          <div class="form-group">
+            <label for="student_name">Student Name:</label>
+            <input type="text" id="student_name" name="student_name" value="{{ enquiry.student_name | default('', true) }}" />
+          </div>
+          <div class="form-group">
+            <label for="father_name">Father Name:</label>
+            <input type="text" id="father_name" name="father_name" value="{{ enquiry.father_name | default('', true) }}" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="mother_name">Mother Name:</label>
+            <input type="text" id="mother_name" name="mother_name" value="{{ enquiry.mother_name | default('', true) }}" />
+          </div>
+          <div class="form-group full-width"></div>
+        </div>
+
+        <div class="section-title">Contact Details</div>
+        <div class="row">
+          <div class="form-group">
+            <label for="student_email">Student Email:</label>
+            <input type="email" id="student_email" name="student_email" value="{{ enquiry.student_email | default('', true) }}" />
+          </div>
+          <div class="form-group">
+            <label for="student_mobile">Student Mobile Number:</label>
+            <input type="text" id="student_mobile" name="student_mobile" value="{{ enquiry.student_mobile | default('', true) }}" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group">
+            <label for="father_mobile">Father Mobile Number:</label>
+            <input type="text" id="father_mobile" name="father_mobile" value="{{ enquiry.father_mobile | default('', true) }}" />
+          </div>
+          <div class="form-group">
+            <label for="mother_mobile">Mother Mobile Number:</label>
+            <input type="text" id="mother_mobile" name="mother_mobile" value="{{ enquiry.mother_mobile | default('', true) }}" />
+          </div>
+        </div>
+
+        <div class="row full-width">
+          <div class="form-group full-width">
+            <label for="address">Address:</label>
+            <textarea id="address" name="address">{{ enquiry.address | default('', true) }}</textarea>
+          </div>
+        </div>
+
+        <div class="row full-width">
+          <div class="form-group full-width">
+            <label for="reference">Reference:</label>
+            <input type="text" id="reference" name="reference" value="{{ enquiry.reference | default('', true) }}" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="pg_course_type">PG Course Applying For:</label>
+            <select id="pg_course_type" name="pg_course_type" class="styled-select">
+              <option value="">-- Select --</option>
+              <option value="MBA" {% if enquiry.pg_course_type == 'MBA' %}selected{% endif %}>MBA</option>
+              <option value="MCA" {% if enquiry.pg_course_type == 'MCA' %}selected{% endif %}>MCA</option>
+              <option value="M.TECH" {% if enquiry.pg_course_type == 'M.TECH' %}selected{% endif %}>M.TECH</option>
+            </select>
+          </div>
+          <div class="form-group" id="ug-course-wrapper">
+            <label for="ug_course_type">UG Course</label>
+            <select id="ug_course_type" name="ug_course_type" class="styled-select">
+              <option value="">Select</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title">UG Performance</div>
+        <div class="row">
+          <div class="form-group">
+            <label for="ug_cgpa">UG CGPA / CGPA up to highest sem</label>
+            <input type="number" id="ug_cgpa" name="ug_cgpa" value="{{ enquiry.ug_cgpa | default('', true) }}" step="any" />
+          </div>
+          <div class="form-group">
+            <label for="entrance_exam">Entrance Exam</label>
+            <select id="entrance_exam" name="entrance_exam" class="styled-select">
+              <option value="">-- Select --</option>
+              <option value="PGCET" {% if enquiry.entrance_exam == 'PGCET' %}selected{% endif %}>PGCET</option>
+              <option value="GATE" {% if enquiry.entrance_exam == 'GATE' %}selected{% endif %}>GATE</option>
+              <option value="CAT" {% if enquiry.entrance_exam == 'CAT' %}selected{% endif %}>CAT</option>
+              <option value="MAT" {% if enquiry.entrance_exam == 'MAT' %}selected{% endif %}>MAT</option>
+              <option value="Other" {% if enquiry.entrance_exam == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="print-hidden{% if user_role == 'councellor' %} save-disabled{% endif %}" {% if user_role == 'councellor' %}disabled{% endif %}>Save Changes</button>
+        </div>
+      </form>
+
+      {% endif %}
+    </div>
+  </body>
+  <script>
+    // Option sets based on PG course type
+    const UG_OPTIONS_MAP = {
+      MBA: [
+        'BBA',
+        'B.COM',
+        'BCA',
+        'B.E/B.TECH',
+        'BSC',
+        'OTHERS'
+      ],
+      MCA: [
+        'BCA',
+        'B.E (COMPUTER SCIENCE)',
+        'BSC/B.COM/B.A (WITH MATHS IN 12TH OR DEGREE)'
+      ],
+      'M.TECH': []
+    };
+
+    // Entrance Exam options per PG program
+    const EXAM_OPTIONS_MAP = {
+      MBA: ['PGCET', 'CAT', 'MAT'],
+      MCA: ['PGCET'],
+      'M.TECH': ['GATE']
+    };
+
+    function updatePGDependentFields() {
+      const pgSelect = document.getElementById('pg_course_type');
+      const ugSelect = document.getElementById('ug_course_type');
+      const ugWrapper = document.getElementById('ug-course-wrapper');
+      // Inject current DB values safely into JS
+      const currentUG = {{ enquiry.ug_course_type | default('', true) | tojson }};
+      const currentExam = {{ enquiry.entrance_exam | default('', true) | tojson }};
+      const pgValue = pgSelect ? pgSelect.value : '';
+
+      const options = UG_OPTIONS_MAP[pgValue] || [];
+
+      // Hide the UG field for M.TECH or when there are no options
+      if (options.length === 0) {
+        if (ugWrapper) ugWrapper.style.display = 'none';
+        if (ugSelect) ugSelect.value = '';
+      } else {
+        if (ugWrapper) ugWrapper.style.display = '';
+
+        // Rebuild options
+        if (ugSelect) {
+          ugSelect.innerHTML = '';
+          const defaultOpt = document.createElement('option');
+          defaultOpt.value = '';
+          defaultOpt.textContent = 'Select';
+          ugSelect.appendChild(defaultOpt);
+
+          options.forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val;
+            ugSelect.appendChild(opt);
+          });
+          // If existing value from DB isn't in the list, add it so it displays
+          if (currentUG && !options.includes(currentUG)) {
+            const custom = document.createElement('option');
+            custom.value = currentUG;
+            custom.textContent = currentUG;
+            ugSelect.appendChild(custom);
+          }
+          // Select the current value if present (only if present in menu)
+          const toSelect = options.includes(currentUG) ? currentUG : '';
+          ugSelect.value = toSelect;
+        }
+      }
+
+      // Entrance exam options
+      const examSelect = document.getElementById('entrance_exam');
+      const examOptions = EXAM_OPTIONS_MAP[pgValue] || ['PGCET', 'GATE', 'CAT', 'MAT'];
+      if (examSelect) {
+        const prev = examSelect.value || currentExam || '';
+        examSelect.innerHTML = '';
+        const def = document.createElement('option');
+        def.value = '';
+        def.textContent = '-- Select --';
+        examSelect.appendChild(def);
+        examOptions.forEach(v => {
+          const o = document.createElement('option');
+          o.value = v; o.textContent = v; examSelect.appendChild(o);
+        });
+        if (prev && !examOptions.includes(prev)) {
+          const custom = document.createElement('option');
+          custom.value = prev; custom.textContent = prev; examSelect.appendChild(custom);
+        }
+        examSelect.value = prev || '';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const pgSelect = document.getElementById('pg_course_type');
+      if (pgSelect) {
+        updatePGDependentFields();
+        pgSelect.addEventListener('change', function() {
+          // Clear stored UG value when PG changes
+          const ugSelect = document.getElementById('ug_course_type');
+          if (ugSelect) ugSelect.value = '';
+          const examSelect = document.getElementById('entrance_exam');
+          if (examSelect) examSelect.value = '';
+          updatePGDependentFields();
+        });
+      }
+    });
+  </script>
+</html>
+
+
