@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, abort
+from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify
 from supabase import create_client, Client
 from datetime import datetime
 from dotenv import load_dotenv
@@ -487,6 +487,70 @@ def change_password():
             USERS[username]['password'] = new_password
             message = 'Password changed successfully!'
     return render_template('change_password.html', message=message, error=error)
+
+@app.route('/search_enquiries', methods=['GET'])
+@require_admin_or_councellor
+def search_enquiries():
+    """AJAX endpoint for live search functionality"""
+    if 'user' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    search_query = request.args.get('q', '').strip()
+    status_filter = request.args.get('status', 'All')
+    follow_up_date_filter = request.args.get('follow_up_date', '')
+    token_date = request.args.get('token_date', '')
+    token_format = request.args.get('token_format', 'pg_date')
+    
+    if not search_query:
+        return jsonify({'enquiries': [], 'total': 0})
+
+    try:
+        # Base query
+        query = supabase.table('admission_enquiries').select('*')
+
+        # Apply search filter
+        query = query.ilike('student_name', f"%{search_query}%")
+
+        # Apply other filters
+        if status_filter and status_filter != 'All':
+            query = query.eq('status', status_filter)
+        if follow_up_date_filter:
+            query = query.eq('follow_up_date', follow_up_date_filter)
+        if token_date:
+            try:
+                parts = token_date.split('-')
+                if len(parts) == 3:
+                    date_prefix = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                    query = query.ilike('token_number', f"{date_prefix}%")
+            except Exception:
+                pass
+
+        # Sort by created_at descending
+        query = query.order('created_at', desc=True)
+        
+        # Limit results for performance
+        query = query.limit(50)
+        
+        data = query.execute()
+        enquiries = data.data
+
+        # Format token numbers using the existing filter
+        for enquiry in enquiries:
+            if enquiry.get('token_number'):
+                enquiry['formatted_token'] = format_token_filter(
+                    enquiry['token_number'], 
+                    token_format, 
+                    enquiry
+                )
+
+        return jsonify({
+            'enquiries': enquiries,
+            'total': len(enquiries),
+            'search_query': search_query
+        })
+
+    except Exception as e:
+        return jsonify({'error': f'Database error: {str(e)}'}), 500
 
 if __name__ == '__main__':
     # Use debug=True only for development

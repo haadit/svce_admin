@@ -396,6 +396,85 @@
         background: #10b981; /* green */
         box-shadow: 0 4px 10px rgba(16,185,129,0.35);
       }
+      
+      /* Live Search Styles */
+      .search-container {
+        position: relative;
+        flex: 1;
+      }
+      
+      #search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        margin-top: 4px;
+      }
+      
+      .search-result-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .search-result-item:hover,
+      .search-result-item.selected {
+        background-color: #f8fafc;
+      }
+      
+      .search-result-item:last-child {
+        border-bottom: none;
+      }
+      
+      .search-result-name {
+        font-weight: 500;
+        color: #2d3a4a;
+      }
+      
+      .search-result-token {
+        font-size: 0.9em;
+        color: #6b7280;
+        font-weight: 600;
+      }
+      
+      .search-result-status {
+        font-size: 0.85em;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+      
+      .status-waiting { background-color: #e0e7ff; color: #2563eb; }
+      .status-counseling-done { background-color: #d1fae5; color: #059669; }
+      .status-booking-done { background-color: #ffedd5; color: #ea580c; }
+      .status-follow-up { background-color: #fee2e2; color: #dc2626; }
+      .status-comedk { background-color: #fef9c3; color: #a16207; }
+      .status-cet { background-color: #ffafcc; color: #16a34a; }
+      
+      .no-results {
+        padding: 16px;
+        text-align: center;
+        color: #6b7280;
+        font-style: italic;
+      }
+      
+      .search-loading {
+        padding: 16px;
+        text-align: center;
+        color: #6b7280;
+      }
     </style>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
@@ -442,7 +521,10 @@
         <button type="button" id="clear-filters-btn" style="background: #e0e7ff; color: #dc3545; font-weight: 600; padding: 10px 18px; border-radius: 8px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: background 0.2s, transform 0.1s; margin-left: 10px;" onclick="clearFilters()">Clear Filters</button>
         <div style="width: 100%; display: flex; align-items: center; gap: 20px;">
           <label for="search-query">Search by Student Name:</label>
-          <input type="text" name="search_query" id="search-query" value="{{ search_query | default('', true) }}" placeholder="Enter student name" onchange="this.form.submit()" style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; transition: border-color 0.2s, box-shadow 0.2s;" />
+          <div class="search-container">
+            <input type="text" name="search_query" id="search-query" value="{{ search_query | default('', true) }}" placeholder="Enter student name to search..." style="padding: 11px 16px; border: 1.5px solid #3b4a5a; border-radius: 8px; font-size: 1.05em; background: #f8fafc; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; box-sizing: border-box;" />
+            <div id="search-results"></div>
+          </div>
           <div style="display: inline-flex; align-items: center; gap: 10px; margin-left: auto;">
             <label for="token-format-toggle" style="font-weight: 600; color: #3b4a5a;">PG/UG</label>
             <div class="switch-container" title="Toggle token display format">
@@ -651,7 +733,204 @@
               filterTableByCourseType(false); // Show PG forms
             }
           }
+          
+          // Initialize live search functionality
+          initializeLiveSearch();
         });
+        
+        // Live Search Functionality
+        let searchTimeout;
+        let currentSearchRequest;
+        
+        function initializeLiveSearch() {
+          const searchInput = document.getElementById('search-query');
+          const searchResults = document.getElementById('search-results');
+          
+          if (!searchInput || !searchResults) return;
+          
+          // Handle input changes
+          searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            // Clear previous timeout
+            if (searchTimeout) {
+              clearTimeout(searchTimeout);
+            }
+            
+            // Cancel previous request if it exists
+            if (currentSearchRequest) {
+              currentSearchRequest.abort();
+            }
+            
+            // Hide results if query is empty
+            if (!query) {
+              searchResults.style.display = 'none';
+              searchResults.innerHTML = '';
+              return;
+            }
+            
+            // Show loading state
+            searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+            searchResults.style.display = 'block';
+            
+            // Debounce search requests
+            searchTimeout = setTimeout(() => {
+              performLiveSearch(query);
+            }, 300);
+          });
+          
+          // Handle focus events
+          searchInput.addEventListener('focus', function() {
+            const query = this.value.trim();
+            if (query && searchResults.children.length > 0) {
+              searchResults.style.display = 'block';
+            }
+          });
+          
+          // Handle click outside to close results
+          document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+              searchResults.style.display = 'none';
+            }
+          });
+          
+          // Handle keyboard navigation
+          searchInput.addEventListener('keydown', function(e) {
+            const visibleResults = Array.from(searchResults.querySelectorAll('.search-result-item'));
+            const currentIndex = visibleResults.findIndex(item => item.classList.contains('selected'));
+            
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              const nextIndex = currentIndex < visibleResults.length - 1 ? currentIndex + 1 : 0;
+              selectSearchResult(visibleResults, nextIndex);
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              const prevIndex = currentIndex > 0 ? currentIndex - 1 : visibleResults.length - 1;
+              selectSearchResult(visibleResults, prevIndex);
+            } else if (e.key === 'Enter') {
+              e.preventDefault();
+              if (currentIndex >= 0 && visibleResults[currentIndex]) {
+                const selectedItem = visibleResults[currentIndex];
+                const enquiryId = selectedItem.dataset.enquiryId;
+                if (enquiryId) {
+                  navigateToEnquiry(enquiryId);
+                }
+              }
+            } else if (e.key === 'Escape') {
+              searchResults.style.display = 'none';
+              searchInput.blur();
+            }
+          });
+        }
+        
+        function selectSearchResult(results, index) {
+          results.forEach((item, i) => {
+            item.classList.toggle('selected', i === index);
+          });
+        }
+        
+        function performLiveSearch(query) {
+          // Get current filter values
+          const statusFilter = document.getElementById('status-filter').value;
+          const followUpDateFilter = document.getElementById('follow-up-date-filter').value;
+          const tokenDateFilter = document.getElementById('token-date-picker').value;
+          const tokenFormat = document.getElementById('token-format-hidden').value;
+          
+          // Build search URL
+          const searchUrl = new URL('/search_enquiries', window.location.origin);
+          searchUrl.searchParams.set('q', query);
+          searchUrl.searchParams.set('status', statusFilter);
+          searchUrl.searchParams.set('follow_up_date', followUpDateFilter);
+          searchUrl.searchParams.set('token_date', tokenDateFilter);
+          searchUrl.searchParams.set('token_format', tokenFormat);
+          
+          // Create abort controller for this request
+          const controller = new AbortController();
+          currentSearchRequest = controller;
+          
+          fetch(searchUrl, {
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json',
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Search request failed');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (controller.signal.aborted) return;
+            
+            displaySearchResults(data.enquiries, query);
+          })
+          .catch(error => {
+            if (controller.signal.aborted) return;
+            
+            console.error('Search error:', error);
+            document.getElementById('search-results').innerHTML = 
+              '<div class="no-results">Error performing search. Please try again.</div>';
+          })
+          .finally(() => {
+            currentSearchRequest = null;
+          });
+        }
+        
+        function displaySearchResults(enquiries, query) {
+          const searchResults = document.getElementById('search-results');
+          
+          if (!enquiries || enquiries.length === 0) {
+            searchResults.innerHTML = '<div class="no-results">No students found matching "' + query + '"</div>';
+            return;
+          }
+          
+          const resultsHtml = enquiries.map(enquiry => {
+            const tokenText = enquiry.formatted_token || enquiry.token_number || 'N/A';
+            const statusClass = getStatusClass(enquiry.status);
+            const statusText = enquiry.status || 'Unknown';
+            
+            return `
+              <div class="search-result-item" data-enquiry-id="${enquiry.id}" onclick="navigateToEnquiry('${enquiry.id}')">
+                <div>
+                  <div class="search-result-name">${enquiry.student_name || 'Unknown'}</div>
+                  <div class="search-result-token">${tokenText}</div>
+                </div>
+                <div class="search-result-status ${statusClass}">${statusText}</div>
+              </div>
+            `;
+          }).join('');
+          
+          searchResults.innerHTML = resultsHtml;
+        }
+        
+        function getStatusClass(status) {
+          if (!status) return '';
+          
+          const statusMap = {
+            'Waiting for counseling': 'status-waiting',
+            'Counciling done.': 'status-counseling-done',
+            'booking done.': 'status-booking-done',
+            'need to follow up.': 'status-follow-up',
+            'Waiting for COMEDK': 'status-comedk',
+            'Waiting for CET': 'status-cet'
+          };
+          
+          return statusMap[status] || '';
+        }
+        
+        function navigateToEnquiry(enquiryId) {
+          // Determine if it's a PG or UG form based on current token format
+          const tokenFormat = document.getElementById('token-format-hidden').value;
+          const isPG = tokenFormat === 'pg_date';
+          
+          let url = `/edit_enquiry/${enquiryId}`;
+          if (isPG) {
+            url += '?pg=1';
+          }
+          
+          window.location.href = url;
+        }
       </script>
       {% else %}
       <p>No admission enquiries found.</p>
