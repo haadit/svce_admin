@@ -29,10 +29,12 @@
       .print-table th, .print-table td { border: 1px solid #666; padding: 2px 4px; text-align: left; line-height: 1.2; }
       .print-table th { background-color: #f2f2f2; font-weight: bold; }
       .section-title-print { background-color: #e0e7ff; color: #007bff; font-size: 1.1em; padding: 8px; font-weight: 600; }
+      .notes-cell { border: 1px solid #ccc; background-color: #f9f9f9; min-height: 40px; vertical-align: top; }
+      .notes-label { width: 25%; font-weight: bold; vertical-align: top; }
 
       @media print {
         @page { margin: 0.5cm; }
-        .button-group, .print-btn, .back-link, .print-hidden, form { display: none !important; }
+        .button-group, .print-btn, .back-link, .print-hidden, form, .header-section img { display: none !important; }
         .print-only { display: block !important; }
         .print-only-inline { display: block !important; }
         .created-at-print { display: flex !important; visibility: visible !important; justify-content: flex-end !important; width: 100% !important; margin: 0 0 8px 0 !important; position: static !important; text-align: right !important; z-index: 9999 !important; box-sizing: border-box !important; }
@@ -135,6 +137,90 @@
             </tr>
           </tbody>
         </table>
+
+        <table class="print-table" style="margin-top: 10px;">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Annual Fee Structure</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Post Graduation Courses:</td>
+            </tr>
+            <tr>
+              <td>Master of Business Administration - B295</td>
+              <td style="text-align: right;">₹2,00,000/-</td>
+            </tr>
+            <tr>
+              <td>Master of Computer Applications - C605</td>
+              <td style="text-align: right;">₹1,25,000/-</td>
+            </tr>
+            <tr>
+              <td>M.Tech (Structural Engineering) - T915</td>
+              <td style="text-align: right;">₹1,25,000/-</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Hostel (Accommodation Only):</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with shared bathrooms</td>
+              <td style="text-align: right;">₹55,000/-</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with ensuite bathrooms (Boys only)</td>
+              <td style="text-align: right;">₹75,000/-</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Hostel (Accommodation with Food):</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with shared bathrooms</td>
+              <td style="text-align: right;">₹1,10,000/-</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with ensuite bathrooms (Boys only)</td>
+              <td style="text-align: right;">₹1,30,000/-</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Transportation (Outsourced)*:</td>
+            </tr>
+            <tr>
+              <td>Chintamani Route</td>
+              <td style="text-align: right;">₹45,000/-</td>
+            </tr>
+            <tr>
+              <td>Other Routes</td>
+              <td style="text-align: right;">₹40,000/-</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="print-table" style="margin-top: 15px;">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Notes & Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="notes-label">Counselor Notes:</td>
+              <td class="notes-cell">{{ enquiry.remarks | default('', true) }}</td>
+            </tr>
+            <!-- <tr>
+              <td class="notes-label">Follow-up Date:</td>
+              <td>{{ enquiry.follow_up_date | default('', true) }}</td>
+            </tr> -->
+            <tr>
+              <td class="notes-label">Status:</td>
+              <td>{{ enquiry.status | default('', true) }}</td>
+            </tr>
+            <tr>
+              <td class="notes-label">Additional Notes:</td>
+              <td class="notes-cell"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <form method="POST">
@@ -233,6 +319,14 @@
               <option value="MAT" {% if enquiry.entrance_exam == 'MAT' %}selected{% endif %}>MAT</option>
               <option value="Other" {% if enquiry.entrance_exam == 'Other' %}selected{% endif %}>Other</option>
             </select>
+          </div>
+        </div>
+
+        <div class="section-title">Notes & Remarks</div>
+        <div class="row full-width">
+          <div class="form-group full-width">
+            <label for="remarks">Counselor Notes:</label>
+            <textarea id="remarks" name="remarks" placeholder="Add any additional notes or remarks here...">{{ enquiry.remarks | default('', true) }}</textarea>
           </div>
         </div>
 

@@ -302,7 +302,8 @@
           .mandatory-note,
           .info-box,
           .print-hidden,
-          form { /* Hide the entire form during print */
+          form,
+          .header-section img { /* Hide the entire form during print */
               display: none !important;
           }
           .print-only {
@@ -820,6 +821,49 @@
                 </tr>
                 {% endif %}
             {% endfor %}
+          </tbody>
+        </table>
+
+        <table class="print-table" style="margin-top: 15px;">
+          <thead>
+            <tr>
+              <th colspan="2" class="section-title-print">Annual Fee Structure</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Hostel (Accommodation Only):</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with shared bathrooms</td>
+              <td style="text-align: right;">₹55,000/-</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with ensuite bathrooms (Boys only)</td>
+              <td style="text-align: right;">₹75,000/-</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Hostel (Accommodation with Food):</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with shared bathrooms</td>
+              <td style="text-align: right;">₹1,10,000/-</td>
+            </tr>
+            <tr>
+              <td>Bedrooms with ensuite bathrooms (Boys only)</td>
+              <td style="text-align: right;">₹1,30,000/-</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-weight: bold; background-color: #f0f0f0;">Transportation (Outsourced)*:</td>
+            </tr>
+            <tr>
+              <td>Chintamani Route</td>
+              <td style="text-align: right;">₹45,000/-</td>
+            </tr>
+            <tr>
+              <td>Other Routes</td>
+              <td style="text-align: right;">₹40,000/-</td>
+            </tr>
           </tbody>
         </table>
 
